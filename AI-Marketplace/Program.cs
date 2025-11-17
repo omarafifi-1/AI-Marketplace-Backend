@@ -1,5 +1,9 @@
 using AI_Marketplace.Application;
+using AI_Marketplace.Domain.Entities;
 using AI_Marketplace.Infrastructure;
+using AI_Marketplace.Infrastructure.Data;
+using Microsoft.AspNetCore.Identity;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +13,9 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
