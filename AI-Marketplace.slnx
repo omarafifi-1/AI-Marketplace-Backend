@@ -1,3 +1,6 @@
 <Solution>
-  <Project Path="AI-Marketplace/AI-Marketplace.csproj" />
+  <Project Path="AI-Marketplace.Application/AI-Marketplace.Application.csproj" />
+  <Project Path="AI-Marketplace.Domain/AI-Marketplace.Domain.csproj" />
+  <Project Path="AI-Marketplace.Infrastructure/AI-Marketplace.Infrastructure.csproj" />
+  <Project Path="AI-Marketplace/AI-Marketplace.WebAPI.csproj" />
 </Solution>
