@@ -10,7 +10,7 @@ namespace AI_Marketplace.Application
             services.AddMediatR(config => 
                 config.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
 
-            services.AddAutoMapper(typeof(DependencyInjection).Assembly);
+            services.AddAutoMapper(cfg => { }, typeof(DependencyInjection).Assembly);
 
 
             // --- Example: Add FluentValidation ---
