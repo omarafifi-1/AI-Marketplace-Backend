@@ -1,0 +1,6 @@
+@AI_Marketplace_HostAddress = http://localhost:5270
+
+GET {{AI_Marketplace_HostAddress}}/AIMarketplace/
+Accept: application/json
+
+###
