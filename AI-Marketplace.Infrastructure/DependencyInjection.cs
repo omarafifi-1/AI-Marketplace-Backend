@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AI_Marketplace.Infrastructure
@@ -10,18 +11,10 @@ namespace AI_Marketplace.Infrastructure
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            // --- Example: Add EF Core ---
-            // 1. You would first install:
-            //    - Microsoft.EntityFrameworkCore.SqlServer
-            //    - Microsoft.EntityFrameworkCore.Tools
-            //
-            // 2. You would add your connection string to appsettings.json in the WebAPI project.
-            //
-            // 3. You would uncomment and update this:
-            /*
-            services.AddDbContext<YourAppDbContext>(options =>
+
+            services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
-            */
+           
 
 
             // --- Example: Add Repositories ---
