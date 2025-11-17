@@ -2,6 +2,7 @@ using AI_Marketplace.Application;
 using AI_Marketplace.Domain.Entities;
 using AI_Marketplace.Infrastructure;
 using AI_Marketplace.Infrastructure.Data;
+using AI_Marketplace.Infrastructure.Seed;
 using Microsoft.AspNetCore.Identity;
 using System;
 
@@ -31,6 +32,13 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Seed roles on startup
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
+    await RoleSeeder.SeedRolesAsync(roleManager);
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -44,6 +52,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAllOrigins");
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
