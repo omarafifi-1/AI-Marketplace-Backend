@@ -1,3 +1,4 @@
+using AI_Marketplace.Api.Middleware;
 using AI_Marketplace.Application;
 using AI_Marketplace.Domain.Entities;
 using AI_Marketplace.Infrastructure;
@@ -38,6 +39,9 @@ using (var scope = app.Services.CreateScope())
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
     await RoleSeeder.SeedRolesAsync(roleManager);
 }
+
+// Add the exception handling middleware FIRST
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

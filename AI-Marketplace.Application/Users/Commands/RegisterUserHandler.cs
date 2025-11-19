@@ -1,4 +1,5 @@
-﻿using AI_Marketplace.Application.Common.Interfaces;
+﻿using AI_Marketplace.Application.Common.Exceptions;
+using AI_Marketplace.Application.Common.Interfaces;
 using AI_Marketplace.Application.Users.DTOs;
 using AI_Marketplace.Domain.Entities;
 using MediatR;
@@ -29,7 +30,10 @@ namespace AI_Marketplace.Application.Users.Commands.RegisterUser
             
             if (!validRoles.Contains(role))
             {
-                throw new Exception($"Invalid role '{role}'. Valid roles are: Admin, Seller, Customer");
+                throw new ValidationException(new Dictionary<string, string[]>
+                {
+                    { "Role", new[] { $"Invalid role '{role}'. Valid roles are: Admin, Seller, Customer" } }
+                });
             }
 
             var user = new ApplicationUser
@@ -44,8 +48,14 @@ namespace AI_Marketplace.Application.Users.Commands.RegisterUser
 
             if (!result.Succeeded)
             {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                throw new Exception($"User registration failed: {errors}");
+                var errors = result.Errors
+                    .GroupBy(e => e.Code)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(e => e.Description).ToArray()
+                    );
+
+                throw new ValidationException(errors);
             }
 
             // Assign role using UserManager after user creation
@@ -53,8 +63,14 @@ namespace AI_Marketplace.Application.Users.Commands.RegisterUser
             
             if (!roleResult.Succeeded)
             {
-                var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
-                throw new Exception($"Role assignment failed: {errors}");
+                var errors = roleResult.Errors
+                    .GroupBy(e => e.Code)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(e => e.Description).ToArray()
+                    );
+
+                throw new ValidationException(errors);
             }
 
             // Create a store for the seller
