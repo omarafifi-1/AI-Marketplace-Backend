@@ -21,8 +21,6 @@ namespace AI_Marketplace.Controllers
 
         
         [HttpPost("register")]
-        [ProducesResponseType(typeof(UserResponseDto), 200)]
-        [ProducesResponseType(400)]
         public async Task<ActionResult<UserResponseDto>> Register([FromBody] RegisterUserDto dto)
         {
             var command = new RegisterUserCommand
