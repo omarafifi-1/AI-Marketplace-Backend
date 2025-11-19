@@ -9,5 +9,7 @@ namespace AI_Marketplace.Application.Users.DTOs
         public string Email { get; set; }
         public string Role { get; set; }
         public DateTime CreatedAt { get; set; }
+        public int? StoreId { get; set; }
+        public string? StoreName { get; set; }
     }
 }

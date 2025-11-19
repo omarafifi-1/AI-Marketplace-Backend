@@ -1,4 +1,5 @@
-﻿using AI_Marketplace.Application.Users.DTOs;
+﻿using AI_Marketplace.Application.Common.Interfaces;
+using AI_Marketplace.Application.Users.DTOs;
 using AI_Marketplace.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -12,10 +13,12 @@ namespace AI_Marketplace.Application.Users.Commands.RegisterUser
     public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, UserResponseDto>
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IStoreRepository _storerepo;
 
-        public RegisterUserCommandHandler(UserManager<ApplicationUser> userManager)
+        public RegisterUserCommandHandler(UserManager<ApplicationUser> userManager, IStoreRepository storerepo)
         {
             _userManager = userManager;
+            _storerepo = storerepo;
         }
 
         public async Task<UserResponseDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
@@ -54,6 +57,22 @@ namespace AI_Marketplace.Application.Users.Commands.RegisterUser
                 throw new Exception($"Role assignment failed: {errors}");
             }
 
+            // Create a store for the seller
+            Store? store = null;
+            if (role == "Seller")
+            {
+                var st = new Store
+                {
+                    StoreName = $"{user.UserName}'s Store",
+                    OwnerId = user.Id,
+                    ContactEmail = user.Email,
+                    CreatedAt = DateTime.UtcNow,
+                    IsActive = true,
+                    IsVerified = false
+                };
+                store = await _storerepo.CreateAsync(st, cancellationToken);
+            }
+
             // Get the actual assigned roles
             var userRoles = await _userManager.GetRolesAsync(user);
 
@@ -63,7 +82,9 @@ namespace AI_Marketplace.Application.Users.Commands.RegisterUser
                 UserName = user.UserName,
                 Email = user.Email,
                 Role = userRoles.FirstOrDefault() ?? string.Empty,
-                CreatedAt = user.CreatedAt
+                CreatedAt = user.CreatedAt,
+                StoreId = store?.Id,
+                StoreName = store?.StoreName
             };
         }
     }
