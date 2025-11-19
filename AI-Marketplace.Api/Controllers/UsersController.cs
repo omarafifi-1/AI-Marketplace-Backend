@@ -19,10 +19,10 @@ namespace AI_Marketplace.Controllers
             _mediator = mediator;
         }
 
-        /// <summary>
-        /// Register a new user
-        /// </summary>
+        
         [HttpPost("register")]
+        [ProducesResponseType(typeof(UserResponseDto), 200)]
+        [ProducesResponseType(400)]
         public async Task<ActionResult<UserResponseDto>> Register([FromBody] RegisterUserDto dto)
         {
             var command = new RegisterUserCommand
@@ -37,10 +37,9 @@ namespace AI_Marketplace.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Get all users
-        /// </summary>
+
         [HttpGet]
+        [ProducesResponseType(typeof(List<UserResponseDto>), 200)]
         public async Task<ActionResult<List<UserResponseDto>>> GetAllUsers()
         {
             var query = new GetAllUsersQuery();

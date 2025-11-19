@@ -1,4 +1,6 @@
-﻿using AI_Marketplace.Infrastructure.Data;
+﻿using AI_Marketplace.Application.Common.Interfaces;
+using AI_Marketplace.Infrastructure.Data;
+using AI_Marketplace.Infrastructure.Repositories.Stores;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,10 +18,8 @@ namespace AI_Marketplace.Infrastructure
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
            
-            // --- Example: Add Repositories ---
-            // services.AddScoped<IUserRepository, UserRepository>();
-            // services.AddScoped<IProductRepository, ProductRepository>();
-
+            // Register Repositories
+            services.AddScoped<IStoreRepository, StoreRepository>();
 
             // Add other infrastructure services (email, payments, etc.)
             // services.AddTransient<IEmailService, EmailService>();
