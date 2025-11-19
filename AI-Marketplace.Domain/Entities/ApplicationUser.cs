@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Microsoft.AspNetCore.Identity;
 
 namespace AI_Marketplace.Domain.Entities
@@ -14,5 +13,10 @@ namespace AI_Marketplace.Domain.Entities
         public bool IsActive { get; set; } = true;
 
         // Navigation Properties
+        public Store? Store { get; set; }
+        public ICollection<CustomRequest> CustomRequests { get; set; } = new List<CustomRequest>();
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
+        public ICollection<ChatSession> ChatSessions { get; set; } = new List<ChatSession>();
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }
 }
