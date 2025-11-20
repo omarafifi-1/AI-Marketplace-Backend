@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AI_Marketplace.Application.Users.Commands.RegisterUser
+namespace AI_Marketplace.Application.Users.Commands
 {
     public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, UserResponseDto>
     {

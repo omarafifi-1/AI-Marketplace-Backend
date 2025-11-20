@@ -1,5 +1,7 @@
 ﻿using AI_Marketplace.Application.Common.Interfaces;
+using AI_Marketplace.Application.Common.Settings;
 using AI_Marketplace.Infrastructure.Data;
+using AI_Marketplace.Infrastructure.ExternalServices;
 using AI_Marketplace.Infrastructure.Repositories.Stores;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -21,8 +23,8 @@ namespace AI_Marketplace.Infrastructure
             // Register Repositories
             services.AddScoped<IStoreRepository, StoreRepository>();
 
-            // Add other infrastructure services (email, payments, etc.)
-            // services.AddTransient<IEmailService, EmailService>();
+            // Register JWT Token Service
+            services.AddScoped<IJwtTokenService, JwtTokenService>();
 
             return services;
         }
