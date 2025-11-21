@@ -7,6 +7,8 @@ using AI_Marketplace.Infrastructure.Data;
 using AI_Marketplace.Infrastructure.Seed;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -63,6 +65,9 @@ using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
     await RoleSeeder.SeedRolesAsync(roleManager);
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    //db.Database.Migrate();
+    DbSeeder.Seed(db);
 }
 
 // Add the exception handling middleware FIRST
