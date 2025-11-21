@@ -27,6 +27,7 @@ namespace AI_Marketplace.Controllers
             {
                 Email = dto.Email,
                 Password = dto.Password,
+                RePassword = dto.RePassword,
                 UserName = dto.UserName,
                 Role = dto.Role
             };

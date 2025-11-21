@@ -24,6 +24,15 @@ namespace AI_Marketplace.Application.Users.Commands
 
         public async Task<UserResponseDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {
+            // Check if passwords match
+            if (request.Password != request.RePassword)
+            {
+                throw new ValidationException(new Dictionary<string, string[]>
+                {
+                    { "Password", new[] { "Passwords Do Not Match." } }
+                });
+            }
+
             // Validate role
             var validRoles = new[] { "Admin", "Seller", "Customer" };
             var role = string.IsNullOrWhiteSpace(request.Role) ? "Customer" : request.Role;
@@ -32,7 +41,7 @@ namespace AI_Marketplace.Application.Users.Commands
             {
                 throw new ValidationException(new Dictionary<string, string[]>
                 {
-                    { "Role", new[] { $"Invalid role '{role}'. Valid roles are: Admin, Seller, Customer" } }
+                    { "Role", new[] { $"Invalid Role '{role}'. Valid Roles are: Admin, Seller, Customer" } }
                 });
             }
 

@@ -13,6 +13,10 @@ namespace AI_Marketplace.Application.Users.DTOs
         public string Password { get; set; }
 
         [Required]
+        [StringLength(100, MinimumLength = 8)]
+        public string RePassword { get; set; }
+
+        [Required]
         public string UserName { get; set; }
 
         /// <summary>
