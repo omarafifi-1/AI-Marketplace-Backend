@@ -1,4 +1,5 @@
 ﻿using AI_Marketplace.Application.Products.DTOs;
+using AI_Marketplace.Application.Products.Queries.FilteredProducts;
 using AI_Marketplace.Application.Products.Queries.GetAllProducts;
 using AI_Marketplace.Application.Products.Queries.GetProductById;
 using MediatR;
@@ -58,6 +59,14 @@ namespace AI_Marketplace.Controllers
             if (result == null)
                 return NotFound();
 
+            return Ok(result);
+        }
+
+        [HttpGet("filter")]
+        public async Task<IActionResult> FilterProducts(
+    [FromQuery] GetFilteredProductsQuery query)
+        {
+            var result = await _mediator.Send(query);
             return Ok(result);
         }
     }
