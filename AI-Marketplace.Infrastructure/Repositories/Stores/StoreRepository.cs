@@ -51,5 +51,17 @@ namespace AI_Marketplace.Infrastructure.Repositories.Stores
         {
             return await _context.Stores.AnyAsync(s => s.OwnerId == ownerId, cancellationToken);
         }
+
+        public async Task<Store> UpdateAsync(Store store, CancellationToken cancellationToken = default)
+        {
+            if (store == null)
+            {
+                throw new ArgumentNullException(nameof(store));
+            }
+            
+            _context.Stores.Update(store);
+            await _context.SaveChangesAsync(cancellationToken);
+            return store;
+        }
     }
 }
