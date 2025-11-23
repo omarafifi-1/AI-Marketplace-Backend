@@ -11,5 +11,6 @@ namespace AI_Marketplace.Application.Common.Interfaces
         public Task<Store?> GetByOwnerIdAsync(int ownerId, CancellationToken cancellationToken = default);
         public Task<Store?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
         public Task<bool> ExistsByOwnerIdAsync(int ownerId, CancellationToken cancellationToken = default);
+        public Task<Store> UpdateAsync(Store store, CancellationToken cancellationToken = default);
     }
 }
