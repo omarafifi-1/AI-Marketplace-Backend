@@ -34,7 +34,7 @@ namespace AI_Marketplace.Infrastructure.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.StoreName).IsRequired().HasMaxLength(200);
                 entity.Property(e => e.Rating).HasPrecision(3, 2);
-                
+
                 entity.HasOne(e => e.Owner)
                     .WithOne(u => u.Store)
                     .HasForeignKey<Store>(e => e.OwnerId)
@@ -121,6 +121,9 @@ namespace AI_Marketplace.Infrastructure.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.ProposedPrice).HasPrecision(18, 2);
                 entity.Property(e => e.Status).HasMaxLength(50);
+
+                entity.HasIndex(e => new { e.CustomRequestId, e.StoreId })
+                      .IsUnique();
 
                 entity.HasOne(e => e.CustomRequest)
                     .WithMany(cr => cr.Offers)
