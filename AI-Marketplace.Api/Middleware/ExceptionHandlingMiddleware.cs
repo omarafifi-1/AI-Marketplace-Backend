@@ -1,5 +1,6 @@
 using AI_Marketplace.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
@@ -48,6 +49,29 @@ namespace AI_Marketplace.Api.Middleware
                     errors = validationEx.Errors
                 };
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
+            }
+            else if (exception is DuplicateOfferException duplicateEx)
+            {
+                errorResponse = new
+                {
+                    statusCode = (int)HttpStatusCode.Conflict,
+                    message = duplicateEx.Message,
+                    errors = new Dictionary<string, string[]>()
+                };
+                response.StatusCode = (int)HttpStatusCode.Conflict;
+            }
+            else if (exception is DbUpdateException dbEx && 
+                     (dbEx.InnerException?.Message.Contains("IX_Offers_CustomRequestId_StoreId_Unique") == true ||
+                      dbEx.InnerException?.Message.Contains("unique constraint", StringComparison.OrdinalIgnoreCase) == true))
+            {
+                _logger.LogWarning(dbEx, "Database unique constraint violation on Offers table");
+                errorResponse = new
+                {
+                    statusCode = (int)HttpStatusCode.Conflict,
+                    message = "Store has already submitted an offer for this custom request.",
+                    errors = new Dictionary<string, string[]>()
+                };
+                response.StatusCode = (int)HttpStatusCode.Conflict;
             }
             else if (exception is UnauthorizedAccessException)
             {
