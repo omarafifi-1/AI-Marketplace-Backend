@@ -4,6 +4,7 @@ using AI_Marketplace.Infrastructure.Data;
 using AI_Marketplace.Infrastructure.Repositories.Products;
 using AI_Marketplace.Infrastructure.ExternalServices;
 using AI_Marketplace.Infrastructure.Repositories.Stores;
+using AI_Marketplace.Infrastructure.Repositories.Offers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,7 @@ namespace AI_Marketplace.Infrastructure
             // Register Repositories
             services.AddScoped<IStoreRepository, StoreRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IOfferRepository, OfferRepository>();
 
             // Register JWT Token Service
             services.AddScoped<IJwtTokenService, JwtTokenService>();
