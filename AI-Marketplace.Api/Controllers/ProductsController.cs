@@ -1,6 +1,5 @@
 ﻿using AI_Marketplace.Application.Products.Commands;
 using AI_Marketplace.Application.Products.DTOs;
-using AI_Marketplace.Application.Products.Queries.FilteredProducts;
 using AI_Marketplace.Application.Products.Queries.GetAllProducts;
 using AI_Marketplace.Application.Products.Queries.GetProductById;
 using MediatR;
@@ -24,16 +23,28 @@ namespace AI_Marketplace.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetAllProducts([FromQuery] int page = 1, [FromQuery] int pageSize = 20,
-        [FromQuery] string? sortBy = "date", [FromQuery] string? sortDirection = "desc")
+        public async Task<ActionResult> GetAllProducts(
+     [FromQuery] int page = 1,
+     [FromQuery] int pageSize = 20,
+     [FromQuery] string? sortBy = "date",
+     [FromQuery] string? sortDirection = "desc",
+     [FromQuery] int? categoryId = null,
+     [FromQuery] decimal? minPrice = null,
+     [FromQuery] decimal? maxPrice = null,
+     [FromQuery] string? keyword = null
+ )
         {
             var query = new GetAllProductsQuery
-            {
-                Page = page,
-                PageSize = pageSize,
-                SortBy = sortBy,
-                SortDirection = sortDirection
-            };
+            (
+                Page: page,
+                PageSize: pageSize,
+                SortBy: sortBy,
+                SortDirection: sortDirection,
+                CategoryId: categoryId,
+                MinPrice: minPrice,
+                MaxPrice: maxPrice,
+                Keyword: keyword
+            );
 
             var result = await _mediator.Send(query);
 
@@ -54,13 +65,6 @@ namespace AI_Marketplace.Controllers
             if (result == null)
                 return NotFound();
 
-            return Ok(result);
-        }
-
-        [HttpGet("filter")]
-        public async Task<IActionResult> FilterProducts([FromQuery] GetFilteredProductsQuery query)
-        {
-            var result = await _mediator.Send(query);
             return Ok(result);
         }
 
