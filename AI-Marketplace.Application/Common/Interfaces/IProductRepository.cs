@@ -7,7 +7,12 @@ namespace AI_Marketplace.Application.Common.Interfaces
 {
     public interface IProductRepository
     {
-        IQueryable<Product> GetQueryable();        
-        Task<Product?> GetByIdAsync(int id);
+        IQueryable<Product> GetQueryable();      
+        
+        Task<Product?> GetByIdAsync(int id, CancellationToken cancellationToken);
+
+        Task<Product> CreateAsync(Product product, CancellationToken cancellationToken);
+
+        Task<ProductImage> UploadProductImageAsync(ProductImage productImage, CancellationToken cancellationToken);
     }
 }

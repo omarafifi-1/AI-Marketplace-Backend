@@ -17,19 +17,33 @@ namespace AI_Marketplace.Infrastructure.Repositories.Products
             _context = context;
             
         }
-        public async Task<Product?> GetByIdAsync(int id)
+        public async Task<Product?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
             return await _context.Products
                .Include(p => p.ProductImages)
                .Include(p => p.Store)
                .Include(p => p.Category)
-               .FirstOrDefaultAsync(p => p.Id == id);
+               .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
         }
 
         public IQueryable<Product> GetQueryable()
         {
             return _context.Products.AsQueryable();
             
+        }
+
+        public async Task<Product> CreateAsync(Product product, CancellationToken cancellationToken)
+        {
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync(cancellationToken);
+            return product;
+        }
+
+        public async Task<ProductImage> UploadProductImageAsync(ProductImage productImage, CancellationToken cancellationToken)
+        {
+            _context.ProductImages.Add(productImage);
+            await _context.SaveChangesAsync(cancellationToken);
+            return productImage;
         }
     }
 }
