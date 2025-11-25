@@ -8,6 +8,7 @@ using AI_Marketplace.Infrastructure.Repositories.Offers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using AI_Marketplace.Infrastructure.Repositories.Categories;
 
 namespace AI_Marketplace.Infrastructure
 {
@@ -26,6 +27,7 @@ namespace AI_Marketplace.Infrastructure
             services.AddScoped<IStoreRepository, StoreRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IOfferRepository, OfferRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
 
             // Register JWT Token Service
             services.AddScoped<IJwtTokenService, JwtTokenService>();
