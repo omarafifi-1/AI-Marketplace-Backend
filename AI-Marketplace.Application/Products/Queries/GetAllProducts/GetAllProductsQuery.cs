@@ -10,7 +10,11 @@ namespace AI_Marketplace.Application.Products.Queries.GetAllProducts
         int Page = 1,
         int PageSize = 20,
         string? SortBy = "date",          
-        string? SortDirection = "desc"
+        string? SortDirection = "desc",
+        int? CategoryId = null,
+        decimal? MinPrice = null,
+        decimal? MaxPrice = null,
+        string? Keyword = null
         ) : IRequest<PagedProductDto>;
     
 }
