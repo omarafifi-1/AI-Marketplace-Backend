@@ -8,7 +8,6 @@ using AI_Marketplace.Infrastructure.Seed;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -46,7 +45,12 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddJwtBearerAuth();
+});
+
+
 
 builder.Services.AddCors(options =>
 {
@@ -80,8 +84,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/openapi/v1.json", "AI-Marketplace API v1");
+        options.DocumentTitle = "AI Marketplace API";
     });
 }
+
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 
