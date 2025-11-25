@@ -22,23 +22,36 @@ namespace AI_Marketplace.Controllers
             _mediator = mediator;
 
         }
-
         [HttpGet]
-        public async Task<ActionResult> GetAllProducts([FromQuery] int page = 1, [FromQuery] int pageSize = 20,
-        [FromQuery] string? sortBy = "date", [FromQuery] string? sortDirection = "desc")
+        public async Task<ActionResult> GetAllProducts(
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 20,
+    [FromQuery] string? sortBy = "date",
+    [FromQuery] string? sortDirection = "desc",
+    [FromQuery] int? categoryId = null,
+    [FromQuery] decimal? minPrice = null,
+    [FromQuery] decimal? maxPrice = null,
+    [FromQuery] string? keyword = null
+)
         {
             var query = new GetAllProductsQuery
-            {
-                Page = page,
-                PageSize = pageSize,
-                SortBy = sortBy,
-                SortDirection = sortDirection
-            };
+            (
+                Page: page,
+                PageSize: pageSize,
+                SortBy: sortBy,
+                SortDirection: sortDirection,
+                CategoryId: categoryId,
+                MinPrice: minPrice,
+                MaxPrice: maxPrice,
+                Keyword: keyword
+            );
 
             var result = await _mediator.Send(query);
 
             return Ok(result);
         }
+
+
 
         [HttpGet("{id:int}")]
         public async Task<ActionResult> GetProductById(int id)
@@ -57,12 +70,7 @@ namespace AI_Marketplace.Controllers
             return Ok(result);
         }
 
-        [HttpGet("filter")]
-        public async Task<IActionResult> FilterProducts([FromQuery] GetFilteredProductsQuery query)
-        {
-            var result = await _mediator.Send(query);
-            return Ok(result);
-        }
+      
 
         [HttpPost("Create")]
         public async Task<IActionResult> CreateProduct(CreateProductDto createProductDto)
