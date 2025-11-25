@@ -43,7 +43,7 @@ namespace AI_Marketplace.Application.Products.Commands
             {
                 throw new ValidationException(new Dictionary<string, string[]>
                 {
-                    { "CategoryId", new[] { "Category Not Found." } }
+                    { "Category", new[] { "Category Not Found." } }
                 });
             }
             var product = new Product
