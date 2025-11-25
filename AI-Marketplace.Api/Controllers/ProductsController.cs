@@ -1,5 +1,6 @@
 ﻿using AI_Marketplace.Application.Products.Commands;
 using AI_Marketplace.Application.Products.DTOs;
+using AI_Marketplace.Application.Products.Queries.FilteredProducts;
 using AI_Marketplace.Application.Products.Queries.GetAllProducts;
 using AI_Marketplace.Application.Products.Queries.GetProductById;
 using MediatR;
