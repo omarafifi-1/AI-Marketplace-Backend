@@ -90,5 +90,33 @@ namespace AI_Marketplace.Controllers
             var result = await _mediator.Send(command);
             return Ok(result);
         }
+
+        [HttpPut("EditProduct/{id:int}")]
+        public async Task<IActionResult> EditProduct(int id, EditProductDto editProductDto)
+        {
+            var UserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (UserIdString == null)
+            {
+                return Unauthorized();
+            }
+            var UserIdInt = int.Parse(UserIdString);
+            if (!int.TryParse(UserIdString, out UserIdInt))
+            {
+                return BadRequest("Invalid User ID");
+            }
+            var command = new EditProductCommand
+            {
+                ProductId = id,
+                UserId = UserIdInt,
+                Name = editProductDto.Name,
+                Description = editProductDto.Description,
+                Price = editProductDto.Price,
+                Stock = editProductDto.Stock,
+                CategoryId = editProductDto.CategoryId,
+                IsActive = editProductDto.IsActive
+            };
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
     }
 }

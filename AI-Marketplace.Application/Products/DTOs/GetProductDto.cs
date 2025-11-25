@@ -13,6 +13,8 @@ namespace AI_Marketplace.Application.Products.DTOs
         public int Stock { get; set; }
         public int CategoryId { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public bool IsActive { get; set; }
         public string VendorName { get; set; } = string.Empty;
         public List<string> ImageUrls { get; set; } = new();
 

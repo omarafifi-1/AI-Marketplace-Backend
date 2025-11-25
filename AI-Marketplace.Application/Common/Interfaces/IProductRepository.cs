@@ -14,5 +14,6 @@ namespace AI_Marketplace.Application.Common.Interfaces
         Task<Product> CreateAsync(Product product, CancellationToken cancellationToken);
 
         Task<ProductImage> UploadProductImageAsync(ProductImage productImage, CancellationToken cancellationToken);
+        Task UpdateAsync(Product product, CancellationToken cancellationToken);
     }
 }

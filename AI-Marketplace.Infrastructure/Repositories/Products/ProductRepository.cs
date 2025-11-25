@@ -45,5 +45,11 @@ namespace AI_Marketplace.Infrastructure.Repositories.Products
             await _context.SaveChangesAsync(cancellationToken);
             return productImage;
         }
+
+        public async Task UpdateAsync(Product product, CancellationToken cancellationToken)
+        {
+            _context.Products.Update(product);
+            await  _context.SaveChangesAsync(cancellationToken);
+        }
     }
 }
