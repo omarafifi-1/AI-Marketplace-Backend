@@ -118,5 +118,27 @@ namespace AI_Marketplace.Controllers
             var result = await _mediator.Send(command);
             return Ok(result);
         }
+
+        [HttpDelete("DeleteProduct/{id:int}")]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            var UserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (UserIdString == null)
+            {
+                return Unauthorized();
+            }
+            var UserIdInt = int.Parse(UserIdString);
+            if (!int.TryParse(UserIdString, out UserIdInt))
+            {
+                return BadRequest("Invalid User ID");
+            }
+            var command = new DeleteProductCommand
+            {
+                ProductId = id,
+                UserId = UserIdInt
+            };
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
     }
 }
