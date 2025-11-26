@@ -48,5 +48,21 @@ namespace AI_Marketplace.Controllers
             var result = await _mediator.Send(command);
             return CreatedAtAction(nameof(GetCategoryById), new { id = result.Id }, result);
         }
+
+        [HttpPut]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateCategory(UpdateCategoryDto updateCategoryDto)
+        {
+            var command = new UpdateCategoryCommand
+            {
+                Id = updateCategoryDto.Id,
+                Name = updateCategoryDto.Name,
+                Description = updateCategoryDto.Description,
+                ParentCategoryId = updateCategoryDto.ParentCategoryId,
+                RemoveParentCategory = updateCategoryDto.RemoveParentCategory
+            };
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
     }
 }
