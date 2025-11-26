@@ -64,5 +64,14 @@ namespace AI_Marketplace.Controllers
             var result = await _mediator.Send(command);
             return Ok(result);
         }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            var command = new DeleteCategoryCommand(id);
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
     }
 }
