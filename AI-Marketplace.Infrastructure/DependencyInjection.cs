@@ -32,6 +32,9 @@ namespace AI_Marketplace.Infrastructure
             // Register JWT Token Service
             services.AddScoped<IJwtTokenService, JwtTokenService>();
 
+            // Register File Service
+            services.AddScoped<IFileService, Services.FileService>();
+
             return services;
         }
     }
