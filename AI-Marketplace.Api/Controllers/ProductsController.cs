@@ -3,6 +3,7 @@ using AI_Marketplace.Application.Products.DTOs;
 using AI_Marketplace.Application.Products.Queries.GetAllProducts;
 using AI_Marketplace.Application.Products.Queries.GetProductById;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -69,6 +70,7 @@ namespace AI_Marketplace.Controllers
         }
 
         [HttpPost("Create")]
+        [Authorize(Roles = "Admin, Seller")]
         public async Task<IActionResult> CreateProduct(CreateProductDto createProductDto)
         {
             var UserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -96,6 +98,7 @@ namespace AI_Marketplace.Controllers
         }
 
         [HttpPut("EditProduct/{id:int}")]
+        [Authorize(Roles = "Admin, Seller")]
         public async Task<IActionResult> EditProduct(int id, EditProductDto editProductDto)
         {
             var UserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -124,6 +127,7 @@ namespace AI_Marketplace.Controllers
         }
 
         [HttpDelete("DeleteProduct/{id:int}")]
+        [Authorize(Roles = "Admin, Seller")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var UserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

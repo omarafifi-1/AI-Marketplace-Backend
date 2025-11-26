@@ -33,5 +33,22 @@ namespace AI_Marketplace.Infrastructure.Repositories.Categories
             await _context.SaveChangesAsync(cancellationToken);
             return category;
         }
+
+        public async Task<Category> UpdateAsync(Category category, CancellationToken cancellationToken = default)
+        {
+            _context.Categories.Update(category);
+            await _context.SaveChangesAsync(cancellationToken);
+            return category;
+        }
+
+        public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var category = await GetByIdAsync(id, cancellationToken);
+            if (category != null)
+            {
+                _context.Categories.Remove(category);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+        }
     }
 }

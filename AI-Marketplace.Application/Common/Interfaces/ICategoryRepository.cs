@@ -10,5 +10,7 @@ namespace AI_Marketplace.Application.Common.Interfaces
         public Task<Category?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
         public Task<List<Category>> GetAllAsync(CancellationToken cancellationToken = default);
         public Task<Category> CreateAsync(Category category, CancellationToken cancellationToken = default);
+        public Task<Category> UpdateAsync(Category category, CancellationToken cancellationToken = default);
+        public Task DeleteAsync(int id, CancellationToken cancellationToken = default);
     }
 }
