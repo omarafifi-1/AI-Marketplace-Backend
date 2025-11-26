@@ -83,6 +83,16 @@ namespace AI_Marketplace.Api.Middleware
                 };
                 response.StatusCode = (int)HttpStatusCode.Unauthorized;
             }
+            else if (exception is NotFoundException notFoundEx)
+            {
+                errorResponse = new
+                {
+                    statusCode = (int)HttpStatusCode.NotFound,
+                    message = notFoundEx.Message,
+                    errors = notFoundEx.Errors
+                };
+                response.StatusCode = (int)HttpStatusCode.NotFound;
+            }
             else
             {
                 errorResponse = new
