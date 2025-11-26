@@ -23,6 +23,8 @@ namespace AI_Marketplace.Infrastructure.Data
         public DbSet<Review> Reviews { get; set; }
         public DbSet<ChatSession> ChatSessions { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
+        public DbSet<Cart> Carts { get; set; } // ← ADD THIS
+        public DbSet<CartItem> CartItems { get; set; } // ← ADD THIS
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -217,6 +219,46 @@ namespace AI_Marketplace.Infrastructure.Data
                     .WithMany(cs => cs.ChatMessages)
                     .HasForeignKey(e => e.ChatSessionId)
                     .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<Cart>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasOne(e => e.User)
+                    .WithOne(u => u.Cart)
+                    .HasForeignKey<Cart>(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(e => e.UserId)
+                    .IsUnique(); 
+
+                entity.Ignore(e => e.TotalAmount); 
+                entity.Ignore(e => e.TotalItems);  
+            });
+
+            modelBuilder.Entity<CartItem>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.UnitPrice)
+                    .HasPrecision(18, 2);
+
+                entity.HasOne(e => e.Cart)
+                    .WithMany(c => c.CartItems)
+                    .HasForeignKey(e => e.CartId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Product)
+                    .WithMany(p => p.CartItems)
+                    .HasForeignKey(e => e.ProductId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // Prevent duplicate products in same cart
+                entity.HasIndex(e => new { e.CartId, e.ProductId })
+                    .IsUnique();
+
+                entity.Ignore(e => e.TotalPrice); // Calculated property
             });
         }
     }
