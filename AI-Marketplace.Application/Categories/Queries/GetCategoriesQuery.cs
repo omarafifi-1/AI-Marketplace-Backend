@@ -6,7 +6,7 @@ using System.Text;
 
 namespace AI_Marketplace.Application.Categories.Queries
 {
-    public class GetCategoriesQuery : IRequest<List<GetCategoriesDto>>
+    public class GetCategoriesQuery : IRequest<List<GetCategoryDto>>
     {
     }
 }

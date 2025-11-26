@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AI_Marketplace.Application.Categories.DTOs
 {
-    public class GetCategoriesDto
+    public class GetCategoryDto
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;

@@ -8,7 +8,7 @@ using System.Text;
 
 namespace AI_Marketplace.Application.Categories.Queries
 {
-    public class GetCategoriesQueryHandler : IRequestHandler<GetCategoriesQuery, List<GetCategoriesDto>>
+    public class GetCategoriesQueryHandler : IRequestHandler<GetCategoriesQuery, List<GetCategoryDto>>
     {
         private readonly ICategoryRepository _categoryRepository;
 
@@ -17,11 +17,11 @@ namespace AI_Marketplace.Application.Categories.Queries
             _categoryRepository = categoryRepository;
         }
 
-        public async Task<List<GetCategoriesDto>> Handle(GetCategoriesQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetCategoryDto>> Handle(GetCategoriesQuery request, CancellationToken cancellationToken)
         {
             var categories = await _categoryRepository.GetAllAsync(cancellationToken);
             
-            var categoryDtos = categories.Select(c => new GetCategoriesDto
+            var categoryDtos = categories.Select(c => new GetCategoryDto
             {
                 Id = c.Id,
                 Name = c.Name,

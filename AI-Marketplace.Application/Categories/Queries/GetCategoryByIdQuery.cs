@@ -6,7 +6,7 @@ using System.Text;
 
 namespace AI_Marketplace.Application.Categories.Queries
 {
-    public class GetCategoryByIdQuery : IRequest<GetCategoriesDto>
+    public class GetCategoryByIdQuery : IRequest<GetCategoryDto>
     {
         public int Id { get; set; }
         public GetCategoryByIdQuery(int id)
