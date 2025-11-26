@@ -57,5 +57,11 @@ namespace AI_Marketplace.Infrastructure.Repositories.Products
             _context.Products.Remove(product);
             await _context.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task DeleteProductImageAsync(ProductImage productImage, CancellationToken cancellationToken)
+        {
+            _context.ProductImages.Remove(productImage);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
     }
 }
