@@ -1,5 +1,8 @@
-﻿using AI_Marketplace.Application.Categories.Queries;
+﻿using AI_Marketplace.Application.Categories.Commands;
+using AI_Marketplace.Application.Categories.DTOs;
+using AI_Marketplace.Application.Categories.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,6 +33,20 @@ namespace AI_Marketplace.Controllers
             var query = new GetCategoryByIdQuery(id);
             var result = await _mediator.Send(query);
             return Ok(result);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateCategory(CreateCategoryDto createCategoryDto)
+        {
+            var command = new CreateCategoryCommand
+            {
+                Name = createCategoryDto.Name,
+                Description = createCategoryDto.Description,
+                ParentCategoryId = createCategoryDto.ParentCategoryId,
+            };
+            var result = await _mediator.Send(command);
+            return CreatedAtAction(nameof(GetCategoryById), new { id = result.Id }, result);
         }
     }
 }
