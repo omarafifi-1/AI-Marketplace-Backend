@@ -49,13 +49,13 @@ namespace AI_Marketplace.Controllers
             return CreatedAtAction(nameof(GetCategoryById), new { id = result.Id }, result);
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateCategory(UpdateCategoryDto updateCategoryDto)
+        public async Task<IActionResult> UpdateCategory(int id, UpdateCategoryDto updateCategoryDto)
         {
             var command = new UpdateCategoryCommand
             {
-                Id = updateCategoryDto.Id,
+                Id = id,
                 Name = updateCategoryDto.Name,
                 Description = updateCategoryDto.Description,
                 ParentCategoryId = updateCategoryDto.ParentCategoryId,
