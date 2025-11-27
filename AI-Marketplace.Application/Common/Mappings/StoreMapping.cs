@@ -13,7 +13,6 @@ namespace AI_Marketplace.Application.Common.Mappings
         {
             CreateMap<Store, VendorProfileDto>();
             CreateMap<VendorEditDto, Store>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.OwnerId, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.IsActive, opt => opt.Ignore())

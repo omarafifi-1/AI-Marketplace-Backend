@@ -4,6 +4,7 @@ using AI_Marketplace.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace AI_Marketplace.Infrastructure.Repositories.Products
@@ -24,6 +25,16 @@ namespace AI_Marketplace.Infrastructure.Repositories.Products
                .Include(p => p.Store)
                .Include(p => p.Category)
                .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+        }
+
+        public async Task<List<Product>> GetByStoreIdAsync(int storeId, CancellationToken cancellationToken)
+        {
+            return await _context.Products
+                .Include(p => p.ProductImages)
+                .Include(p => p.Store)
+                .Include(p => p.Category)
+                .Where(p => p.StoreId == storeId)
+                .ToListAsync(cancellationToken);
         }
 
         public IQueryable<Product> GetQueryable()
