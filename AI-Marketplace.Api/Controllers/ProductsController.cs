@@ -2,6 +2,7 @@
 using AI_Marketplace.Application.Products.DTOs;
 using AI_Marketplace.Application.Products.Queries.GetAllProducts;
 using AI_Marketplace.Application.Products.Queries.GetProductById;
+using AI_Marketplace.Application.Products.Queries.GetProductByStore;
 using AI_Marketplace.Application.Products.Queries.GetProductImages;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -50,6 +51,28 @@ namespace AI_Marketplace.Controllers
 
             var result = await _mediator.Send(query);
 
+            return Ok(result);
+        }
+
+        [HttpGet("Store")]
+        [Authorize(Roles = "Admin, Seller")]
+        public async Task<ActionResult> GetProductsByStoreId()
+        {
+            var UserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (UserIdString == null)
+            {
+                return Unauthorized();
+            }
+            var UserIdInt = int.Parse(UserIdString);
+            if (!int.TryParse(UserIdString, out UserIdInt))
+            {
+                return BadRequest("Invalid User ID");
+            }
+            var query = new GetProductByStoreQuery
+            {
+                UserId = UserIdInt
+            };
+            var result = await _mediator.Send(query);
             return Ok(result);
         }
 

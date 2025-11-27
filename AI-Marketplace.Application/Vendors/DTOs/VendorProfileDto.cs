@@ -6,6 +6,7 @@ namespace AI_Marketplace.Application.Vendors.DTOs
 {
     public class VendorProfileDto
     {
+        public int Id { get; set; }
         public string StoreName { get; set; } = string.Empty;
         public string? Description { get; set; }
         public string? LogoUrl { get; set; }
