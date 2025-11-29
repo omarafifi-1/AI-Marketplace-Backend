@@ -7,6 +7,7 @@ namespace AI_Marketplace.Domain.Entities
     {
         public int Id { get; set; }
         public int BuyerId { get; set; }
+        public int StoreId { get; set; }
         public int? OfferId { get; set; }
         public decimal TotalAmount { get; set; }
         public string Status { get; set; } = "Pending"; // Pending, Processing, Shipped, Delivered, Cancelled
@@ -17,6 +18,7 @@ namespace AI_Marketplace.Domain.Entities
         // Navigation Properties
         public ApplicationUser Buyer { get; set; } = null!;
         public Offer? Offer { get; set; }
+        public Store Store { get; set; } = null!;
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }
