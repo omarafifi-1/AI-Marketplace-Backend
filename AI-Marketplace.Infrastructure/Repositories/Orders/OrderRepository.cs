@@ -40,7 +40,7 @@ namespace AI_Marketplace.Infrastructure.Repositories.Orders
                 .FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
         }
 
-        public async Task<List<Order>> GetOrdersByStoreId(int storeId, CancellationToken cancellationToken)
+        public async Task<List<Order>> GetOrdersByStoreIdAsync(int storeId, CancellationToken cancellationToken)
         {
             return await _context.Orders
                 .Include(o => o.Buyer)
@@ -52,23 +52,10 @@ namespace AI_Marketplace.Infrastructure.Repositories.Orders
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<Order> ChangeOrderStatusAsync(int id, string status, CancellationToken cancellationToken)
+        public async Task UpdateOrderAsync(Order order, CancellationToken cancellationToken)
         {
-            var order = await _context.Orders.FindAsync(new object[] { id }, cancellationToken);
-            
-            if (order == null)
-                throw new NotFoundException(new Dictionary<string, string[]>
-                {
-                    { "Order", new[] { $"Order With Id {id} Not Found." } }
-                });
-            
-            order.Status = status;
-            
-            if (status == "Delivered")
-                order.DeliveredAt = DateTime.UtcNow;
-            
+            _context.Orders.Update(order);
             await _context.SaveChangesAsync(cancellationToken);
-            return order;
         }
     }
 }
