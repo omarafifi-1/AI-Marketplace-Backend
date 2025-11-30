@@ -19,5 +19,12 @@
   <ItemGroup>
     <ProjectReference Include="..\AI-Marketplace.Domain\AI-Marketplace.Domain.csproj" />
   </ItemGroup>
+	
+  <ItemGroup>
+    <Folder Include="Buyers\Commands\" />
+    <Folder Include="Buyers\DTOs\" />
+    <Folder Include="Orders\Commands\" />
+    <Folder Include="Orders\Queries\" />
+  </ItemGroup>
 
 </Project>
