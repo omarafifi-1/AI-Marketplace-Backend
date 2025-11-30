@@ -56,5 +56,22 @@ namespace AI_Marketplace.Controllers
             var result = await _mediator.Send(command);
             return Ok(result);
         }
+
+        [HttpGet("Orders")]
+        public async Task<IActionResult> GetVendorOrders()
+        {
+            var UserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (UserIdString == null)
+            {
+                return Unauthorized();
+            }
+            if (!int.TryParse(UserIdString, out int UserIdInt))
+            {
+                return BadRequest("Invalid User ID");
+            }
+            var query = new GetVendorOrdersQuery(UserIdInt);
+            var result = await _mediator.Send(query);
+            return Ok(result);
+        }
     }
 }
