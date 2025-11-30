@@ -31,7 +31,7 @@ namespace AI_Marketplace.Application.Vendors.Queries
                     { "Store", new[] { "Store Not Found For The Given Vendor." } }
                 });
             }
-            var orders = await _orderRepository.GetOrdersByStoreId(store.Id, cancellationToken);
+            var orders = await _orderRepository.GetOrdersByStoreIdAsync(store.Id, cancellationToken);
             var orderDtos = _mapper.Map<List<OrderDto>>(orders);
             return orderDtos;
         }
