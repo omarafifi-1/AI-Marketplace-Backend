@@ -18,7 +18,42 @@ namespace AI_Marketplace.Infrastructure.Repositories.Orders
             _context = applicationDbContext;
         }
 
-        public Task<List<Order>> GetAllOrdersAsync(CancellationToken cancellationToken)
+        public async Task<Order> CreateAsync(Order order, CancellationToken cancellationToken = default)
+        {
+            _context.Orders.Add(order);
+            await _context.SaveChangesAsync(cancellationToken);
+            return order;
+        }
+
+        public Task<Order?> GetByIdAsync(int orderId, CancellationToken cancellationToken = default)
+        {
+            return _context.Orders
+                .Include(o => o.Buyer)
+                .Include(o => o.Store)
+                .Include(o => o.Offer)
+                    .ThenInclude(of => of.Store)
+                .Include(o => o.Offer)
+                    .ThenInclude(of => of.CustomRequest)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                .FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
+        }
+
+        public Task<Order?> GetByOfferIdAsync(int offerId, CancellationToken cancellationToken = default)
+        {
+            return _context.Orders
+                .Include(o => o.Buyer)
+                .Include(o => o.Store)
+                .Include(o => o.Offer)
+                    .ThenInclude(of => of.Store)
+                .Include(o => o.Offer)
+                    .ThenInclude(of => of.CustomRequest)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                .FirstOrDefaultAsync(o => o.OfferId == offerId, cancellationToken);
+        }
+
+        public Task<List<Order>> GetAllOrdersAsync(CancellationToken cancellationToken = default)
         {
             return _context.Orders
                 .Include(o => o.Buyer)
@@ -29,18 +64,7 @@ namespace AI_Marketplace.Infrastructure.Repositories.Orders
                 .ToListAsync(cancellationToken);
         }
 
-        public Task<Order?> GetOrderByIdAsync(int id, CancellationToken cancellationToken)
-        {
-            return _context.Orders
-                .Include(o => o.Buyer)
-                .Include(o => o.Store)
-                .Include(o => o.Offer)
-                .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Product)
-                .FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
-        }
-
-        public async Task<List<Order>> GetOrdersByStoreIdAsync(int storeId, CancellationToken cancellationToken)
+        public async Task<List<Order>> GetOrdersByStoreIdAsync(int storeId, CancellationToken cancellationToken = default)
         {
             return await _context.Orders
                 .Include(o => o.Buyer)
@@ -52,7 +76,7 @@ namespace AI_Marketplace.Infrastructure.Repositories.Orders
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task UpdateOrderAsync(Order order, CancellationToken cancellationToken)
+        public async Task UpdateOrderAsync(Order order, CancellationToken cancellationToken = default)
         {
             _context.Orders.Update(order);
             await _context.SaveChangesAsync(cancellationToken);

@@ -7,10 +7,16 @@ namespace AI_Marketplace.Application.Common.Interfaces
 {
     public interface IOrderRepository
     {
-        public Task<List<Order>> GetAllOrdersAsync(CancellationToken cancellationToken);
-        public Task<Order?> GetOrderByIdAsync(int id, CancellationToken cancellationToken);
-        public Task<List<Order>> GetOrdersByStoreIdAsync(int storeId, CancellationToken cancellationToken);
-        public Task UpdateOrderAsync(Order order, CancellationToken cancellationToken);
+        Task<Order> CreateAsync(Order order, CancellationToken cancellationToken = default);
         
+        Task<Order?> GetByIdAsync(int orderId, CancellationToken cancellationToken = default);
+        
+        Task<Order?> GetByOfferIdAsync(int offerId, CancellationToken cancellationToken = default);
+        
+        Task<List<Order>> GetAllOrdersAsync(CancellationToken cancellationToken = default);
+        
+        Task<List<Order>> GetOrdersByStoreIdAsync(int storeId, CancellationToken cancellationToken = default);
+        
+        Task UpdateOrderAsync(Order order, CancellationToken cancellationToken = default);
     }
 }
