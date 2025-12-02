@@ -40,6 +40,15 @@ namespace AI_Marketplace.Infrastructure.Repositories.Orders
                 .FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
         }
 
+        public async Task<List<Order>> GetOrdersByBuyerIdAsync(int buyerId, CancellationToken cancellationToken)
+        {
+            return await _context.Orders
+                    .Where(o => o.BuyerId == buyerId)
+                    .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                    .ToListAsync(cancellationToken);
+        }
+
         public async Task<List<Order>> GetOrdersByStoreIdAsync(int storeId, CancellationToken cancellationToken)
         {
             return await _context.Orders
