@@ -1,5 +1,7 @@
 ﻿using AI_Marketplace.Application.Buyers.Queries.GetAllBuyerOrders;
 using AI_Marketplace.Application.Buyers.Queries.GetBuyerOrderById;
+using AI_Marketplace.Application.Buyers.Queries.GetBuyerStats;
+using AI_Marketplace.Application.Vendors.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -63,6 +65,25 @@ namespace AI_Marketplace.Controllers
             var result = await _mediator.Send(query);
 
             if (result == null) return NotFound();
+            return Ok(result);
+        }
+
+        [HttpGet("stats")]
+        public async Task<IActionResult> GetBuyerStats()
+        {
+            var UserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (UserIdString == null)
+            {
+                return Unauthorized();
+            }
+            if (!int.TryParse(UserIdString, out int UserIdInt))
+            {
+                return BadRequest("Invalid User ID");
+            }
+            var query = new GetBuyerStatsQuery(UserIdInt);
+
+            var result = await _mediator.Send(query);
+
             return Ok(result);
         }
     }
