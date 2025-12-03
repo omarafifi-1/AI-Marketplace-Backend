@@ -101,7 +101,7 @@ namespace AI_Marketplace.Application.Offers.Commands
             }
 
             // 5. Check idempotency - if order already exists for this offer
-            var existingOrder = await _orderRepository.GetByOfferIdAsync(request.OfferId, cancellationToken);
+            var existingOrder = await _orderRepository.GetOrderByOfferIdAsync(request.OfferId, cancellationToken);
             if (existingOrder != null)
             {
                 _logger.LogInformation(

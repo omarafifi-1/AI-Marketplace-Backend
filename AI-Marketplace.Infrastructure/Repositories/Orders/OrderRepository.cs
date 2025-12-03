@@ -39,7 +39,7 @@ namespace AI_Marketplace.Infrastructure.Repositories.Orders
                 .FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
         }
 
-        public Task<Order?> GetByOfferIdAsync(int offerId, CancellationToken cancellationToken = default)
+        public Task<Order?> GetOrderByOfferIdAsync(int offerId, CancellationToken cancellationToken = default)
         {
             return _context.Orders
                 .Include(o => o.Buyer)
