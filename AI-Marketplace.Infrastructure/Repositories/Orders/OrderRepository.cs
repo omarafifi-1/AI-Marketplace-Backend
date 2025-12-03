@@ -25,7 +25,7 @@ namespace AI_Marketplace.Infrastructure.Repositories.Orders
             return order;
         }
 
-        public Task<Order?> GetByIdAsync(int orderId, CancellationToken cancellationToken = default)
+        public Task<Order?> GetOrderByIdAsync(int orderId, CancellationToken cancellationToken = default)
         {
             return _context.Orders
                 .Include(o => o.Buyer)
