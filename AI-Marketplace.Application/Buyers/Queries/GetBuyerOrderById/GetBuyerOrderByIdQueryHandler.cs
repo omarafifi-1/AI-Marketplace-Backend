@@ -20,7 +20,7 @@ namespace AI_Marketplace.Application.Buyers.Queries.GetBuyerOrderById
         }
         public async Task<OrderDto?> Handle(GetBuyerOrderByIdQuery request, CancellationToken cancellationToken)
         {
-            var order = await _orderRepository.GetByIdAsync(request.OrderId, cancellationToken);
+            var order = await _orderRepository.GetOrderByIdAsync(request.OrderId, cancellationToken);
 
             if (order == null) return null;
 

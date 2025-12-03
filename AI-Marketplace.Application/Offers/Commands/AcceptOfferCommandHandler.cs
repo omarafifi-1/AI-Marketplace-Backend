@@ -209,7 +209,7 @@ namespace AI_Marketplace.Application.Offers.Commands
             }
 
             // 8. Retrieve the complete order with all navigation properties for mapping
-            var orderWithDetails = await _orderRepository.GetByIdAsync(createdOrder.Id, cancellationToken);
+            var orderWithDetails = await _orderRepository.GetOrderByIdAsync(createdOrder.Id, cancellationToken);
             if (orderWithDetails == null)
             {
                 _logger.LogError(

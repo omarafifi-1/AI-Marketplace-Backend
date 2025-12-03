@@ -31,7 +31,7 @@ namespace AI_Marketplace.Application.Orders.Commands
                     { "Store", new[] { "Store Not Found For The Given User." } }
                 });
             }
-            var order = await _orderRepository.GetByIdAsync(request.OrderId, cancellationToken);
+            var order = await _orderRepository.GetOrderByIdAsync(request.OrderId, cancellationToken);
             if (order == null || order.StoreId != store.Id)
             {
                 throw new NotFoundException(new Dictionary<string, string[]>
