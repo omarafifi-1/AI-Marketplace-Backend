@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using AI_Marketplace.Infrastructure.Repositories.Categories;
+using AI_Marketplace.Infrastructure.Repositories.Cart;
 
 namespace AI_Marketplace.Infrastructure
 {
@@ -28,6 +29,7 @@ namespace AI_Marketplace.Infrastructure
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IOfferRepository, OfferRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<ICartRepository, CartRepository>();
 
             // Register JWT Token Service
             services.AddScoped<IJwtTokenService, JwtTokenService>();

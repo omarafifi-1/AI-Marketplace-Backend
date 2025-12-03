@@ -11,6 +11,7 @@ namespace AI_Marketplace.Infrastructure.Data
         {
         }
 
+        //Corresponding table entities inside my database 
         public DbSet<Store> Stores { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
@@ -23,8 +24,8 @@ namespace AI_Marketplace.Infrastructure.Data
         public DbSet<Review> Reviews { get; set; }
         public DbSet<ChatSession> ChatSessions { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
-        public DbSet<Cart> Carts { get; set; } // ← ADD THIS
-        public DbSet<CartItem> CartItems { get; set; } // ← ADD THIS
+        public DbSet<Cart> Carts { get; set; } 
+        public DbSet<CartItem> CartItems { get; set; } 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

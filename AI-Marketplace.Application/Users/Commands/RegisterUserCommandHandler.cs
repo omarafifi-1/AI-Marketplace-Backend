@@ -15,11 +15,13 @@ namespace AI_Marketplace.Application.Users.Commands
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IStoreRepository _storerepo;
+        private readonly ICartRepository _cartRepo;
 
-        public RegisterUserCommandHandler(UserManager<ApplicationUser> userManager, IStoreRepository storerepo)
+        public RegisterUserCommandHandler(UserManager<ApplicationUser> userManager, IStoreRepository storerepo, ICartRepository cartRepo)
         {
             _userManager = userManager;
             _storerepo = storerepo;
+            _cartRepo = cartRepo;
         }
 
         public async Task<UserResponseDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
@@ -81,6 +83,15 @@ namespace AI_Marketplace.Application.Users.Commands
 
                 throw new ValidationException(errors);
             }
+
+            // Create an empty cart for the new user
+            var userCart = new Cart
+            {
+                UserId = user.Id,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            await _cartRepo.CreateNewCartAsync(userCart, cancellationToken);
 
             // Create a store for the seller
             Store? store = null;

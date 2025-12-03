@@ -1,11 +1,14 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AI_Marketplace.Domain.Entities
 {
     public class CartItem
     {
         public int Id { get; set; }
+        [ForeignKey("Cart")]
         public int CartId { get; set; }
+        [ForeignKey("Product")]
         public int ProductId { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; } 

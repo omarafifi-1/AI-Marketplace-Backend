@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace AI_Marketplace.Domain.Entities
@@ -7,6 +8,7 @@ namespace AI_Marketplace.Domain.Entities
     public class Cart
     {
         public int Id { get; set; }
+        [ForeignKey("User")]
         public int UserId { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
