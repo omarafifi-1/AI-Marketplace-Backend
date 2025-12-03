@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using AI_Marketplace.Application.Carts.Queries;
 using AI_Marketplace.Application.Carts.DTOs;
 using AI_Marketplace.Application.Carts.Commands;
+using AI_Marketplace.Application.Common.DTOs;
 using System.Security.Claims;
 
 namespace AI_Marketplace.Controllers
@@ -19,8 +20,9 @@ namespace AI_Marketplace.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("index")]
+        [HttpGet]
         [Authorize(Roles = "Customer, Admin")]
+        [ProducesResponseType(typeof(ApiResponse<CartDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetCartById()
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -38,13 +40,14 @@ namespace AI_Marketplace.Controllers
             var result = await _mediator.Send(query);
 
             if (result is null)
-                return NotFound();
+                return NotFound("Cart not found.");
 
-            return Ok(result);
+            return Ok(ApiResponse<CartDto>.Ok(result, "Cart retrieved successfully"));
         }
 
         [HttpPost("add")]
         [Authorize]
+        [ProducesResponseType(typeof(ApiResponse<CartDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> AddProductToCart([FromBody] AddProductToCartDto dto)
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -64,11 +67,12 @@ namespace AI_Marketplace.Controllers
             if (result is null)
                 return NotFound("Product not found or inactive.");
 
-            return Ok(result);
+            return Ok(ApiResponse<CartDto>.Ok(result, "Item added to cart"));
         }
 
         [HttpDelete("item-delete")]
         [Authorize(Roles = "Customer, Admin")]
+        [ProducesResponseType(typeof(ApiResponse<CartDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> RemoveSpecificCartItem([FromBody] RemoveProductFromCartDto dto)
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -84,11 +88,12 @@ namespace AI_Marketplace.Controllers
             if (result is null)
                 return NotFound("Cart or product not found in cart.");
 
-            return Ok(result);
+            return Ok(ApiResponse<CartDto>.Ok(result, "Item removed from cart"));
         }
 
         [HttpPut("update-quantity")]
         [Authorize(Roles = "Customer, Admin")]
+        [ProducesResponseType(typeof(ApiResponse<CartDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> UpdateCartItemQuantity([FromBody] UpdateCartQuantityDto updateDto)
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -104,11 +109,12 @@ namespace AI_Marketplace.Controllers
             if (result is null)
                 return NotFound("Cart or product not found in cart.");
 
-            return Ok(result);
+            return Ok(ApiResponse<CartDto>.Ok(result, "Cart item updated"));
         }
 
         [HttpDelete("clear-cart")]
         [Authorize(Roles = "Customer, Admin")]
+        [ProducesResponseType(typeof(ApiResponse<CartDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> ClearUserCart()
         {
             var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -122,9 +128,9 @@ namespace AI_Marketplace.Controllers
             var result = await _mediator.Send(command);
             
             if (result is null)
-                return NotFound();
+                return NotFound("Cart not found.");
                 
-            return Ok(result);
+            return Ok(ApiResponse<CartDto>.Ok(result, "Cart cleared"));
         }
     }
 }
