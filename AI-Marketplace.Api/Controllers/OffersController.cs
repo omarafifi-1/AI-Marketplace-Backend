@@ -1,5 +1,6 @@
 ﻿using AI_Marketplace.Application.Offers.Commands;
 using AI_Marketplace.Application.Offers.DTOs;
+using AI_Marketplace.Application.Offers.Queries;
 using AI_Marketplace.Application.Offers.Queries.GetOffersByCustomRequestId;
 using AI_Marketplace.Application.Offers.Queries.GetOffersByStoreId;
 using MediatR;
@@ -9,9 +10,7 @@ using System.Security.Claims;
 
 namespace AI_Marketplace.Controllers
 {
-    /// <summary>
-    /// Controller for managing vendor offers on custom requests.
-    /// </summary>
+
     [Route("api/[controller]")]
     [ApiController]
     public class OffersController : ControllerBase
@@ -97,6 +96,86 @@ namespace AI_Marketplace.Controllers
             };
 
             var result = await _mediator.Send(query);
+
+            return Ok(result);
+        }
+
+        [HttpPut("{id:int}/accept")]
+        [Authorize(Roles = "Customer")]
+        [ProducesResponseType(typeof(OrderResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<OrderResponseDto>> AcceptOffer(int id, [FromBody] AcceptOfferDto dto)
+        {
+            // Extract user ID from JWT claims
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(new { message = "Invalid user authentication." });
+            }
+
+            var command = new AcceptOfferCommand
+            {
+                OfferId = id,
+                UserId = userId,
+                ShippingAddress = dto.ShippingAddress
+            };
+
+            var result = await _mediator.Send(command);
+
+            return Ok(result);
+        }
+
+        [HttpPut("{id:int}")]
+        [Authorize(Roles = "Vendor,Seller")]
+        [ProducesResponseType(typeof(OfferResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<OfferResponseDto>> UpdateOffer(int id, [FromBody] UpdateOfferDto dto)
+        {
+            // Extract user ID from JWT claims
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(new { message = "Invalid user authentication." });
+            }
+
+            var command = new UpdateOfferCommand
+            {
+                OfferId = id,
+                UserId = userId,
+                ProposedPrice = dto.ProposedPrice,
+                EstimatedDays = dto.EstimatedDays,
+                Message = dto.Message
+            };
+
+            var result = await _mediator.Send(command);
+
+            return Ok(result);
+        }
+
+        [HttpGet("{id:int}")]
+        [Authorize]
+        [ProducesResponseType(typeof(OfferResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<OfferResponseDto>> GetOfferById(int id)
+        {
+            var query = new GetOfferByIdQuery
+            {
+                OfferId = id
+            };
+
+            var result = await _mediator.Send(query);
+
+            if (result == null)
+            {
+                return NotFound(new { message = $"Offer with ID {id} not found." });
+            }
 
             return Ok(result);
         }

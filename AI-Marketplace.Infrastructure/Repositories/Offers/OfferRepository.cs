@@ -142,16 +142,36 @@ namespace AI_Marketplace.Infrastructure.Repositories.Offers
         {
             try
             {
-                _context.Offers.Update(offer);
-                await _context.SaveChangesAsync(cancellationToken);
+                _logger.LogInformation(
+                    "Updating offer using ExecuteUpdateAsync: OfferId={OfferId}, Status={Status}",
+                    offer.Id,
+                    offer.Status);
+
+                // Use ExecuteUpdateAsync for direct SQL UPDATE - no tracking issues
+                var rowsAffected = await _context.Offers
+                    .Where(o => o.Id == offer.Id)
+                    .ExecuteUpdateAsync(setters => setters
+                        .SetProperty(o => o.ProposedPrice, offer.ProposedPrice)
+                        .SetProperty(o => o.EstimatedDays, offer.EstimatedDays)
+                        .SetProperty(o => o.Message, offer.Message)
+                        .SetProperty(o => o.Status, offer.Status),
+                        cancellationToken);
+
+                if (rowsAffected == 0)
+                {
+                    _logger.LogWarning("No offer found to update: OfferId={OfferId}", offer.Id);
+                    throw new NotFoundException(new Dictionary<string, string[]>
+                    {
+                        { "Offer", new[] { $"Offer with ID {offer.Id} not found." } }
+                    });
+                }
 
                 _logger.LogInformation(
-                    "Offer updated successfully: OfferId={OfferId}, StoreId={StoreId}, Status={Status}, Price={Price}, Days={Days}",
+                    "Offer updated successfully: OfferId={OfferId}, StoreId={StoreId}, Status={Status}, RowsAffected={RowsAffected}",
                     offer.Id,
                     offer.StoreId,
                     offer.Status,
-                    offer.ProposedPrice,
-                    offer.EstimatedDays);
+                    rowsAffected);
             }
             catch (DbUpdateConcurrencyException ex)
             {
