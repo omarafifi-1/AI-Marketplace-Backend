@@ -2,6 +2,8 @@
 using AI_Marketplace.Application.Products.DTOs;
 using AI_Marketplace.Application.Products.Queries.GetAllProducts;
 using AI_Marketplace.Application.Products.Queries.GetProductById;
+using AI_Marketplace.Application.Products.Queries.GetProductByStore;
+using AI_Marketplace.Application.Products.Queries.GetProductImages;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -49,6 +51,28 @@ namespace AI_Marketplace.Controllers
 
             var result = await _mediator.Send(query);
 
+            return Ok(result);
+        }
+
+        [HttpGet("Store")]
+        [Authorize(Roles = "Admin, Seller")]
+        public async Task<ActionResult> GetProductsByStoreId()
+        {
+            var UserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (UserIdString == null)
+            {
+                return Unauthorized();
+            }
+            var UserIdInt = int.Parse(UserIdString);
+            if (!int.TryParse(UserIdString, out UserIdInt))
+            {
+                return BadRequest("Invalid User ID");
+            }
+            var query = new GetProductByStoreQuery
+            {
+                UserId = UserIdInt
+            };
+            var result = await _mediator.Send(query);
             return Ok(result);
         }
 
@@ -147,6 +171,71 @@ namespace AI_Marketplace.Controllers
             };
             var result = await _mediator.Send(command);
             return Ok(result);
+        }
+
+        [HttpPost("{id:int}/images")]
+        [Authorize(Roles = "Admin, Seller")]
+        public async Task<IActionResult> UploadProductImage(int id, IFormFile file)
+        {
+            var UserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (UserIdString == null) return Unauthorized();
+            if (!int.TryParse(UserIdString, out int UserIdInt)) return BadRequest("Invalid User ID");
+
+            var command = new UploadProductImageCommand
+            {
+                ProductId = id,
+                UserId = UserIdInt,
+                File = file
+            };
+
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        [HttpGet("{id:int}/images")]
+        public async Task<IActionResult> GetProductImages(int id)
+        {
+            var query = new GetProductImagesQuery { ProductId = id };
+            var result = await _mediator.Send(query);
+            return Ok(result);
+        }
+
+        [HttpPut("{id:int}/images/{imageId:int}/primary")]
+        [Authorize(Roles = "Admin, Seller")]
+        public async Task<IActionResult> SetPrimaryProductImage(int id, int imageId)
+        {
+            var UserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (UserIdString == null) return Unauthorized();
+            if (!int.TryParse(UserIdString, out int UserIdInt)) return BadRequest("Invalid User ID");
+
+            var command = new SetPrimaryProductImageCommand
+            {
+                ProductId = id,
+                ImageId = imageId,
+                UserId = UserIdInt
+            };
+
+            await _mediator.Send(command);
+            return NoContent();
+        }
+
+        [HttpDelete("{id:int}/images/{imageId:int}")]
+        [Authorize(Roles = "Admin, Seller")]
+        public async Task<IActionResult> DeleteProductImage(int id, int imageId)
+        {
+            var UserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (UserIdString == null) return Unauthorized();
+            if (!int.TryParse(UserIdString, out int UserIdInt)) return BadRequest("Invalid User ID");
+
+            var command = new DeleteProductImageCommand
+            {
+                ProductId = id,
+                ImageId = imageId,
+                UserId = UserIdInt
+            };
+
+            await _mediator.Send(command);
+            return NoContent();
         }
     }
 }

@@ -1,10 +1,10 @@
-﻿using AI_Marketplace.Application.Vendors.Commands;
-using AI_Marketplace.Application.Vendors.DTOs;
+﻿using AI_Marketplace.Application.Buyers.Queries.GetAllBuyerOrders;
+using AI_Marketplace.Application.Buyers.Queries.GetBuyerOrderById;
+using AI_Marketplace.Application.Buyers.Queries.GetBuyerStats;
 using AI_Marketplace.Application.Vendors.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -12,18 +12,19 @@ namespace AI_Marketplace.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Seller")]
-    public class VendorsController : ControllerBase
+    [Authorize(Roles = "Customer")]
+    public class BuyersController : ControllerBase
     {
         private readonly IMediator _mediator;
 
-        public VendorsController(IMediator mediator)
+        public BuyersController(IMediator mediator)
         {
             _mediator = mediator;
+
         }
 
-        [HttpGet("Profile")]
-        public async Task<IActionResult> GetVendorProfile()
+        [HttpGet]
+        public async Task<IActionResult> GetOrders([FromQuery] string? status = "all")
         {
             var UserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (UserIdString == null)
@@ -35,13 +36,40 @@ namespace AI_Marketplace.Controllers
             {
                 return BadRequest("Invalid User ID");
             }
-            var query = new GetVendorProfileQuery(UserIdInt);
+
+            var query = new GetAllBuyerOrderQuery
+            {
+                BuyerId = UserIdInt,
+                Status = status
+            };
+
             var result = await _mediator.Send(query);
             return Ok(result);
         }
 
-        [HttpPost("EditProfile")]
-        public async Task<IActionResult> EditVendorProfile([FromBody] VendorEditDto vendorEditDto)
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetOrderById(int id)
+        {
+            var UserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (UserIdString == null)
+            {
+                return Unauthorized();
+            }
+            var UserIdInt = int.Parse(UserIdString);
+            if (!int.TryParse(UserIdString, out UserIdInt))
+            {
+                return BadRequest("Invalid User ID");
+            }
+
+            var query = new GetBuyerOrderByIdQuery(id, UserIdInt);
+            var result = await _mediator.Send(query);
+
+            if (result == null) return NotFound();
+            return Ok(result);
+        }
+
+        [HttpGet("stats")]
+        public async Task<IActionResult> GetBuyerStats()
         {
             var UserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (UserIdString == null)
@@ -52,42 +80,10 @@ namespace AI_Marketplace.Controllers
             {
                 return BadRequest("Invalid User ID");
             }
-            var command = new EditVendorProfileCommand(UserIdInt, vendorEditDto);
-            var result = await _mediator.Send(command);
-            return Ok(result);
-        }
+            var query = new GetBuyerStatsQuery(UserIdInt);
 
-        [HttpGet("Orders")]
-        public async Task<IActionResult> GetVendorOrders()
-        {
-            var UserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (UserIdString == null)
-            {
-                return Unauthorized();
-            }
-            if (!int.TryParse(UserIdString, out int UserIdInt))
-            {
-                return BadRequest("Invalid User ID");
-            }
-            var query = new GetVendorOrdersQuery(UserIdInt);
             var result = await _mediator.Send(query);
-            return Ok(result);
-        }
 
-        [HttpGet("Statistics")]
-        public async Task<IActionResult> GetVendorStatistics()
-        {
-            var UserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (UserIdString == null)
-            {
-                return Unauthorized();
-            }
-            if (!int.TryParse(UserIdString, out int UserIdInt))
-            {
-                return BadRequest("Invalid User ID");
-            }
-            var query = new GetVendorStatisticsQuery(UserIdInt);
-            var result = await _mediator.Send(query);
             return Ok(result);
         }
     }

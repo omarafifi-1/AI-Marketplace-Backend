@@ -4,6 +4,7 @@ using AI_Marketplace.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AI_Marketplace.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251129160129_AddStoreIdToOrder")]
+    partial class AddStoreIdToOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -103,68 +106,6 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("AI_Marketplace.Domain.Entities.Cart", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("Carts");
-                });
-
-            modelBuilder.Entity("AI_Marketplace.Domain.Entities.CartItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("AddedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CartId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("CartId", "ProductId")
-                        .IsUnique();
-
-                    b.ToTable("CartItems");
                 });
 
             modelBuilder.Entity("AI_Marketplace.Domain.Entities.Category", b =>
@@ -759,36 +700,6 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("AI_Marketplace.Domain.Entities.Cart", b =>
-                {
-                    b.HasOne("AI_Marketplace.Domain.Entities.ApplicationUser", "User")
-                        .WithOne("Cart")
-                        .HasForeignKey("AI_Marketplace.Domain.Entities.Cart", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("AI_Marketplace.Domain.Entities.CartItem", b =>
-                {
-                    b.HasOne("AI_Marketplace.Domain.Entities.Cart", "Cart")
-                        .WithMany("CartItems")
-                        .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AI_Marketplace.Domain.Entities.Product", "Product")
-                        .WithMany("CartItems")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Cart");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("AI_Marketplace.Domain.Entities.Category", b =>
                 {
                     b.HasOne("AI_Marketplace.Domain.Entities.Category", "ParentCategory")
@@ -1034,8 +945,6 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("AI_Marketplace.Domain.Entities.ApplicationUser", b =>
                 {
-                    b.Navigation("Cart");
-
                     b.Navigation("ChatSessions");
 
                     b.Navigation("CustomRequests");
@@ -1045,11 +954,6 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
                     b.Navigation("Reviews");
 
                     b.Navigation("Store");
-                });
-
-            modelBuilder.Entity("AI_Marketplace.Domain.Entities.Cart", b =>
-                {
-                    b.Navigation("CartItems");
                 });
 
             modelBuilder.Entity("AI_Marketplace.Domain.Entities.Category", b =>
@@ -1085,8 +989,6 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("AI_Marketplace.Domain.Entities.Product", b =>
                 {
-                    b.Navigation("CartItems");
-
                     b.Navigation("OrderItems");
 
                     b.Navigation("ProductImages");
