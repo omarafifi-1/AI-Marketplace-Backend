@@ -112,5 +112,100 @@ namespace AI_Marketplace.Infrastructure.Repositories.Offers
                 .AsNoTracking()
                 .AnyAsync(o => o.CustomRequestId == customRequestId && o.StoreId == storeId, cancellationToken);
         }
+
+        public async Task<Offer?> GetByIdAsync(int offerId, CancellationToken cancellationToken = default)
+        {
+            var offer = await _context.Offers
+                .AsNoTracking()
+                .Include(o => o.Store)
+                .Include(o => o.CustomRequest)
+                .FirstOrDefaultAsync(o => o.Id == offerId, cancellationToken);
+
+            if (offer != null)
+            {
+                _logger.LogInformation(
+                    "Retrieved offer: OfferId={OfferId}, StoreId={StoreId}, CustomRequestId={CustomRequestId}, Status={Status}",
+                    offer.Id,
+                    offer.StoreId,
+                    offer.CustomRequestId,
+                    offer.Status);
+            }
+            else
+            {
+                _logger.LogWarning("Offer not found: OfferId={OfferId}", offerId);
+            }
+
+            return offer;
+        }
+
+        public async Task UpdateAsync(Offer offer, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                _logger.LogInformation(
+                    "Updating offer using ExecuteUpdateAsync: OfferId={OfferId}, Status={Status}",
+                    offer.Id,
+                    offer.Status);
+
+                // Use ExecuteUpdateAsync for direct SQL UPDATE - no tracking issues
+                var rowsAffected = await _context.Offers
+                    .Where(o => o.Id == offer.Id)
+                    .ExecuteUpdateAsync(setters => setters
+                        .SetProperty(o => o.ProposedPrice, offer.ProposedPrice)
+                        .SetProperty(o => o.EstimatedDays, offer.EstimatedDays)
+                        .SetProperty(o => o.Message, offer.Message)
+                        .SetProperty(o => o.Status, offer.Status),
+                        cancellationToken);
+
+                if (rowsAffected == 0)
+                {
+                    _logger.LogWarning("No offer found to update: OfferId={OfferId}", offer.Id);
+                    throw new NotFoundException(new Dictionary<string, string[]>
+                    {
+                        { "Offer", new[] { $"Offer with ID {offer.Id} not found." } }
+                    });
+                }
+
+                _logger.LogInformation(
+                    "Offer updated successfully: OfferId={OfferId}, StoreId={StoreId}, Status={Status}, RowsAffected={RowsAffected}",
+                    offer.Id,
+                    offer.StoreId,
+                    offer.Status,
+                    rowsAffected);
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Concurrency error updating offer: OfferId={OfferId}",
+                    offer.Id);
+                throw;
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Database error updating offer: OfferId={OfferId}",
+                    offer.Id);
+                throw;
+            }
+        }
+
+        public async Task<List<Offer>> GetPendingByCustomRequestIdAsync(int customRequestId, CancellationToken cancellationToken = default)
+        {
+            var offers = await _context.Offers
+                .AsNoTracking()
+                .Include(o => o.Store)
+                .Where(o => o.CustomRequestId == customRequestId && o.Status == "Pending")
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync(cancellationToken);
+
+            _logger.LogInformation(
+                "Retrieved {Count} pending offers for CustomRequestId={CustomRequestId}",
+                offers.Count,
+                customRequestId);
+
+            return offers;
+        }
     }
 }

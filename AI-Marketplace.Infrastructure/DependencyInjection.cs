@@ -1,15 +1,16 @@
 ﻿using AI_Marketplace.Application.Common.Interfaces;
 using AI_Marketplace.Application.Common.Settings;
 using AI_Marketplace.Infrastructure.Data;
-using AI_Marketplace.Infrastructure.Repositories.Products;
 using AI_Marketplace.Infrastructure.ExternalServices;
-using AI_Marketplace.Infrastructure.Repositories.Stores;
+using AI_Marketplace.Infrastructure.Repositories.Categories;
+using AI_Marketplace.Infrastructure.Repositories.CustomRequests;
 using AI_Marketplace.Infrastructure.Repositories.Offers;
+using AI_Marketplace.Infrastructure.Repositories.Orders;
+using AI_Marketplace.Infrastructure.Repositories.Products;
+using AI_Marketplace.Infrastructure.Repositories.Stores;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using AI_Marketplace.Infrastructure.Repositories.Categories;
-using AI_Marketplace.Infrastructure.Repositories.Orders;
 
 namespace AI_Marketplace.Infrastructure
 {
@@ -30,6 +31,7 @@ namespace AI_Marketplace.Infrastructure
             services.AddScoped<IOfferRepository, OfferRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<ICustomRequestRepository, CustomRequestRepository>();
 
             // Register JWT Token Service
             services.AddScoped<IJwtTokenService, JwtTokenService>();
