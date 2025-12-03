@@ -22,7 +22,6 @@
 	
   <ItemGroup>
     <Folder Include="Buyers\Commands\" />
-    <Folder Include="Buyers\DTOs\" />
     <Folder Include="Orders\Queries\" />
   </ItemGroup>
 
