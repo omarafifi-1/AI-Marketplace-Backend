@@ -1,10 +1,13 @@
 ﻿using AI_Marketplace.Application.Users.Commands;
+using AI_Marketplace.Application.Users.Commands.UpdateUserProfile;
 using AI_Marketplace.Application.Users.DTOs;
 using AI_Marketplace.Application.Users.Queries.GetAllUsers;
+using AI_Marketplace.Application.Users.Queries.GetUserProfile;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace AI_Marketplace.Controllers
@@ -57,6 +60,47 @@ namespace AI_Marketplace.Controllers
             var query = new GetAllUsersQuery();
             var users = await _mediator.Send(query);
             return Ok(users);
+        }
+
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetProfile()
+        {
+            var UserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (UserIdString == null)
+            {
+                return Unauthorized();
+            }
+            var UserIdInt = int.Parse(UserIdString);
+            if (!int.TryParse(UserIdString, out UserIdInt))
+            {
+                return BadRequest("Invalid User ID");
+            }
+
+            var query = new GetUserProfileQuery(UserIdInt);
+
+            var dto = await _mediator.Send(query);
+            return Ok(dto);
+        }
+
+        [HttpPut("profile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserProfileDto dto)
+        {
+            var UserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (UserIdString == null)
+            {
+                return Unauthorized();
+            }
+            var UserIdInt = int.Parse(UserIdString);
+            if (!int.TryParse(UserIdString, out UserIdInt))
+            {
+                return BadRequest("Invalid User ID");
+            }
+
+            var query = new UpdateUserProfileCommand(UserIdInt, dto);
+
+            var result = await _mediator.Send(query);
+
+            return Ok(result);
         }
     }
 }
