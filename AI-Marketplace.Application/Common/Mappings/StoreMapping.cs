@@ -17,6 +17,8 @@ namespace AI_Marketplace.Application.Common.Mappings
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.IsActive, opt => opt.Ignore())
                 .ForMember(dest => dest.IsVerified, opt => opt.Ignore())
+                .ForMember(dest => dest.VerifiedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.VerifiedBy, opt => opt.Ignore())
                 .ForMember(dest => dest.Rating, opt => opt.Ignore())
                 .ForMember(dest => dest.TotalReviews, opt => opt.Ignore());
         }

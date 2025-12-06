@@ -21,6 +21,7 @@
   </ItemGroup>
 	
   <ItemGroup>
+    <Folder Include="Admin\Commands\" />
     <Folder Include="Buyers\Commands\" />
     <Folder Include="Orders\Queries\" />
   </ItemGroup>

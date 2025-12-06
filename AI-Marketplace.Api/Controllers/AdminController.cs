@@ -24,5 +24,12 @@ namespace AI_Marketplace.Controllers
             var stats = await _mediator.Send(new GetPlatformStatsQuery());
             return Ok(stats);
         }
+
+        [HttpGet("vendors/pending")]
+        public async Task<IActionResult> GetPendingVendors()
+        {
+            var pendingVendors = await _mediator.Send(new GetPendingVendorsQuery());
+            return Ok(pendingVendors);
+        }
     }
 }
