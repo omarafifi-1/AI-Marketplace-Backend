@@ -26,12 +26,14 @@ namespace AI_Marketplace.Application.Buyers.Queries.GetBuyerStats
             var stats = new BuyerStatsDto
             {
                 TotalOrders = orders.Count,
+                //replaced with enums
                 PendingOrders = orders.Count(o => o.Status == OrderStateTypes.Pending.ToString()),
                 CompletedOrders = orders.Count(o => o.Status == OrderStateTypes.Delivered.ToString()),
                 TotalSpent = orders.Sum(o => o.TotalAmount)
             };
 
             return stats;
+
         }
     }
 }
