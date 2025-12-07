@@ -63,5 +63,10 @@ namespace AI_Marketplace.Infrastructure.Repositories.Stores
             await _context.SaveChangesAsync(cancellationToken);
             return store;
         }
+
+        public async Task<List<Store>> GetAllStoresAsync(CancellationToken cancellationToken = default)
+        {
+            return await _context.Stores.ToListAsync(cancellationToken);
+        }
     }
 }
