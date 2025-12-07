@@ -68,5 +68,12 @@ namespace AI_Marketplace.Controllers
             var result = await _mediator.Send(query);
             return Ok(result);
         }
+
+        [HttpGet("Analytics")]
+        public async Task<IActionResult> GetAnalyticsData()
+        {
+            var analyticsData = await _mediator.Send(new GetAnalyticsDataQuery());
+            return Ok(analyticsData);
+        }
     }
 }
