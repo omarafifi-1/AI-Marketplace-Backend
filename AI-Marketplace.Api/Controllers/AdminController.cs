@@ -1,5 +1,6 @@
 ﻿using AI_Marketplace.Application.Admin.Commands;
 using AI_Marketplace.Application.Admin.Queries;
+using AI_Marketplace.Application.Vendors.Queries;
 using AI_Marketplace.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -56,6 +57,15 @@ namespace AI_Marketplace.Controllers
         public async Task<IActionResult> RejectVendor(int storeId)
         {
             var result = await _mediator.Send(new RejectVendorCommand { StoreId = storeId });
+            return Ok(result);
+        }
+
+        [HttpGet("vendors/all")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllVendors()
+        {
+            var query = new GetAllVendorsQuery();
+            var result = await _mediator.Send(query);
             return Ok(result);
         }
     }
