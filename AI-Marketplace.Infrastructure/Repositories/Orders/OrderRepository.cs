@@ -3,6 +3,7 @@ using AI_Marketplace.Application.Common.Interfaces;
 using AI_Marketplace.Domain.Entities;
 using AI_Marketplace.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Update;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,12 +13,12 @@ namespace AI_Marketplace.Infrastructure.Repositories.Orders
     public class OrderRepository : IOrderRepository
     {
         private readonly ApplicationDbContext _context;
-
         public OrderRepository(ApplicationDbContext applicationDbContext) 
         {
             _context = applicationDbContext;
         }
 
+        //CRUD operations for orders
         public async Task<Order> CreateAsync(Order order, CancellationToken cancellationToken = default)
         {
             _context.Orders.Add(order);
@@ -89,6 +90,53 @@ namespace AI_Marketplace.Infrastructure.Repositories.Orders
         {
             _context.Orders.Update(order);
             await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<bool> CancelOrderByOrderIdAsync(int  orderId, CancellationToken cancellationToken)
+        {
+            return (await _context.Orders
+                                  .Where(o => o.Id == orderId)
+                                  .ExecuteDeleteAsync(cancellationToken)) > 0;
+        }
+
+        // CRUD operations for order items
+
+        public async Task<OrderItem?> AddOrderItem(OrderItem orderItem, CancellationToken cancellationToken = default)
+        {
+            await _context.OrderItems.AddAsync(orderItem, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+            return orderItem;
+        }
+
+        public async Task<OrderItem?> GetOrderItemById(int id, CancellationToken cancellationToken = default)
+        {
+            return await _context.OrderItems
+                .Include(oi => oi.Product)
+                .Include(oi => oi.Order)
+                .FirstOrDefaultAsync(oi => oi.Id == id, cancellationToken);
+        }
+
+        public async Task<List<OrderItem>> GetOrderItemsByOrderId(int orderId, CancellationToken cancellationToken = default)
+        {
+            return await _context.OrderItems
+                .Include(oi => oi.Product)
+                .Where(oi => oi.OrderId == orderId)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task UpdateOrderItem(OrderItem orderItem, CancellationToken cancellationToken = default)
+        {
+            _context.OrderItems.Update(orderItem);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<bool> RemoveOrderItem(int orderItemId, CancellationToken cancellationToken = default)
+        {
+            var removed = await _context.OrderItems
+                .Where(oi => oi.Id == orderItemId)
+                .ExecuteDeleteAsync(cancellationToken);
+
+            return removed > 0;
         }
     }
 }

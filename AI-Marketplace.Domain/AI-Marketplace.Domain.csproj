@@ -11,4 +11,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="enums\" />
+  </ItemGroup>
+
 </Project>

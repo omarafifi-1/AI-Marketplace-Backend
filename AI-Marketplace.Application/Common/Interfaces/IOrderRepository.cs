@@ -18,5 +18,12 @@ namespace AI_Marketplace.Application.Common.Interfaces
         public Task<List<Order>> GetOrdersByStoreIdAsync(int storeId, CancellationToken cancellationToken);
         
         public Task UpdateOrderAsync(Order order, CancellationToken cancellationToken);
+        public Task<bool> CancelOrderByOrderIdAsync(int orderId, CancellationToken cancellationToken);
+
+        public Task<OrderItem?> AddOrderItem(OrderItem orderItem, CancellationToken cancellationToken);
+        public Task<OrderItem?> GetOrderItemById(int id, CancellationToken cancellationToken);
+        public Task<List<OrderItem>> GetOrderItemsByOrderId(int orderId, CancellationToken cancellationToken);
+        public Task UpdateOrderItem(OrderItem orderItem, CancellationToken cancellationToken);
+        public Task<bool> RemoveOrderItem(int orderItemId, CancellationToken cancellationToken);
     }
 }
