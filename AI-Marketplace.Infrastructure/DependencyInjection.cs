@@ -2,16 +2,17 @@
 using AI_Marketplace.Application.Common.Settings;
 using AI_Marketplace.Infrastructure.Data;
 using AI_Marketplace.Infrastructure.ExternalServices;
+using AI_Marketplace.Infrastructure.Repositories.Cart;
 using AI_Marketplace.Infrastructure.Repositories.Categories;
 using AI_Marketplace.Infrastructure.Repositories.CustomRequests;
 using AI_Marketplace.Infrastructure.Repositories.Offers;
 using AI_Marketplace.Infrastructure.Repositories.Orders;
 using AI_Marketplace.Infrastructure.Repositories.Products;
 using AI_Marketplace.Infrastructure.Repositories.Stores;
+using AI_Marketplace.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using AI_Marketplace.Infrastructure.Repositories.Cart;
 
 
 namespace AI_Marketplace.Infrastructure
@@ -41,6 +42,9 @@ namespace AI_Marketplace.Infrastructure
 
             // Register File Service
             services.AddScoped<IFileService, Services.FileService>();
+
+            // Register Email Service
+            services.AddTransient<IEmailService, SmtpEmailService>();
 
             return services;
         }
