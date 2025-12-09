@@ -33,26 +33,55 @@ namespace AI_Marketplace.Application.Payment.Commands
                 throw new InvalidOperationException($"Order with ID {request.OrderId} not found.");
             }
 
-
-            var paymentIntentResult = await _stripe.CreatePaymentIntent(request.Amount, request.Currency);
-
-
-            var payment = new Domain.Entities.Payment
+            // Validate inputs (amount is in major units like USD dollars)
+            if (request.Amount <= 0)
             {
-                OrderId = request.OrderId,
-                PaymentMethod = PaymentMethod.Stripe,
-                PaymentIntentId = paymentIntentResult.PaymentIntentId,
-                Amount = request.Amount,
-                Currency = request.Currency,
-                Status = PaymentStatus.Pending,
-                CustomerEmail = order.Buyer?.Email,
-                CustomerName = $"{order.Buyer?.FirstName} {order.Buyer?.LastName}".Trim(),
-                CreatedAt = DateTime.UtcNow
+                throw new InvalidOperationException("Amount must be greater than 0.");
+            }
+            if (string.IsNullOrWhiteSpace(request.Currency) || request.Currency.Length != 3)
+            {
+                throw new InvalidOperationException("Currency must be a 3-letter ISO code (e.g., USD, EUR).");
+            }
+
+            var currency = request.Currency.ToUpperInvariant();
+            var amountInSmallestUnit = ConvertToSmallestUnit(request.Amount, currency);
+
+            try
+            {
+                // Create intent using smallest unit for provider; we persist original major-unit amount
+                var intent = await _stripe.CreatePaymentIntent(amountInSmallestUnit, currency);
+
+                var payment = new Domain.Entities.Payment
+                {
+                    OrderId = request.OrderId,
+                    PaymentMethod = PaymentMethod.Stripe,
+                    PaymentIntentId = intent.PaymentIntentId,
+                    Amount = request.Amount, // major units as provided by user (e.g., USD dollars)
+                    Currency = currency,
+                    Status = PaymentStatus.Pending,
+                    CustomerEmail = order.Buyer?.Email,
+                    CustomerName = $"{order.Buyer?.FirstName} {order.Buyer?.LastName}".Trim(),
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                await _paymentRepository.CreateAsync(payment, cancellationToken);
+
+                return intent.ClientSecret;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Payment provider error: {ex.Message}");
+            }
+        }
+
+        private static long ConvertToSmallestUnit(long amountMajorUnits, string currency)
+        {
+            return currency switch
+            {
+                "JPY" => amountMajorUnits,
+                "KRW" => amountMajorUnits,
+                _ => checked(amountMajorUnits * 100)
             };
-
-            await _paymentRepository.CreateAsync(payment, cancellationToken);
-
-            return paymentIntentResult.ClientSecret;
         }
     }
 }
