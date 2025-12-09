@@ -35,7 +35,7 @@ namespace AI_Marketplace.Application.Users.Queries
             }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var encodedToken = WebUtility.UrlEncode(token);
+            var encodedToken = token.Replace("+", "%2B");
             var encodedEmail = WebUtility.UrlEncode(user.Email);
 
             // This will be handled by Angular route

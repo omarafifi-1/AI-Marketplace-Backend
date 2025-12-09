@@ -29,7 +29,7 @@ namespace AI_Marketplace.Application.Users.Commands
             }
 
             var email = WebUtility.UrlDecode(request.Email);
-            var token = WebUtility.UrlDecode(WebUtility.UrlDecode(request.Token)); // double decode fix
+            var token = request.Token.Replace(" ", "+");
 
             var user = await _userManager.FindByEmailAsync(email);
 
