@@ -284,10 +284,7 @@ namespace AI_Marketplace.Infrastructure.Data
                     .HasForeignKey(e => e.UserId)
                     .OnDelete(DeleteBehavior.NoAction);
 
-                entity.HasOne(e => e.Store)
-                    .WithMany(s => s.Addresses)
-                    .HasForeignKey(e => e.StoreId)
-                    .OnDelete(DeleteBehavior.NoAction);
+               
 
                 entity.HasIndex(e => new { e.UserId, e.IsPrimary }).HasFilter(null);
             });

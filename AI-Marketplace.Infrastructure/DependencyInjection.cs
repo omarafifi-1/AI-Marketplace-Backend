@@ -3,6 +3,7 @@ using AI_Marketplace.Application.Common.Settings;
 using AI_Marketplace.Infrastructure.Data;
 using AI_Marketplace.Infrastructure.ExternalServices;
 using AI_Marketplace.Infrastructure.ExternalServices.payment;
+using AI_Marketplace.Infrastructure.Repositories.Addresses;
 using AI_Marketplace.Infrastructure.Repositories.Cart;
 using AI_Marketplace.Infrastructure.Repositories.Categories;
 using AI_Marketplace.Infrastructure.Repositories.CustomRequests;
@@ -40,6 +41,7 @@ namespace AI_Marketplace.Infrastructure
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<ICustomRequestRepository, CustomRequestRepository>();
             services.AddScoped<IPaymentRepository, PaymentRepository>();
+            services.AddScoped<IAddressRepository, AddressRepository>();
 
             // Register JWT Token Service
             services.AddScoped<IJwtTokenService, JwtTokenService>();
