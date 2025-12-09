@@ -39,7 +39,7 @@ namespace AI_Marketplace.Application.Users.Queries
             var encodedEmail = WebUtility.UrlEncode(user.Email);
 
             // This will be handled by Angular route
-            var resetUrl = $"http://localhost:4200/reset-password?token={encodedToken}&email={encodedEmail}";
+            var resetUrl = $"http://localhost:4200/auth/reset-password?token={encodedToken}&email={encodedEmail}";
 
             var subject = "Reset Your Password";
             var body = $@"
