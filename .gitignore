@@ -16,6 +16,10 @@
 # Mono auto generated files
 mono_crash.*
 
+
+# secret development environment files
+appsettings.Development.json
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

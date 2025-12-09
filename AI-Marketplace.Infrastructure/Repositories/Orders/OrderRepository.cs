@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore.Update;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AI_Marketplace.Infrastructure.Repositories.Orders
 {
@@ -62,6 +64,7 @@ namespace AI_Marketplace.Infrastructure.Repositories.Orders
                 .Include(o => o.Offer)
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Product)
+                .ThenInclude (p => p.ProductImages)
                 .ToListAsync(cancellationToken);
         }
 
