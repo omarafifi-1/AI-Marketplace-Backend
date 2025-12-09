@@ -29,6 +29,7 @@ namespace AI_Marketplace.Infrastructure.ExternalServices
                 AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
                 {
                     Enabled = true,
+                    AllowRedirects = "never"
                 }
             };
 
@@ -63,6 +64,11 @@ namespace AI_Marketplace.Infrastructure.ExternalServices
             {
                 PaymentIntent = paymentIntentId
             };
+
+            if (refundAmount.HasValue)
+            {
+                refundOptions.Amount = refundAmount.Value;
+            }
 
             var refund = await _refundService.CreateAsync(refundOptions, cancellationToken: cancellationToken);
             return refund.Id; 

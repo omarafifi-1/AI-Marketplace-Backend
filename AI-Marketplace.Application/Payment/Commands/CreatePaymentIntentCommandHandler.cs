@@ -48,7 +48,7 @@ namespace AI_Marketplace.Application.Payment.Commands
 
             try
             {
-                // Create intent using smallest unit for provider; we persist original major-unit amount
+                // Create intent
                 var intent = await _stripe.CreatePaymentIntent(amountInSmallestUnit, currency);
 
                 var payment = new Domain.Entities.Payment
@@ -56,7 +56,7 @@ namespace AI_Marketplace.Application.Payment.Commands
                     OrderId = request.OrderId,
                     PaymentMethod = PaymentMethod.Stripe,
                     PaymentIntentId = intent.PaymentIntentId,
-                    Amount = request.Amount, // major units as provided by user (e.g., USD dollars)
+                    Amount = request.Amount, 
                     Currency = currency,
                     Status = PaymentStatus.Pending,
                     CustomerEmail = order.Buyer?.Email,
@@ -74,6 +74,8 @@ namespace AI_Marketplace.Application.Payment.Commands
             }
         }
 
+
+        //Utility method 
         private static long ConvertToSmallestUnit(long amountMajorUnits, string currency)
         {
             return currency switch

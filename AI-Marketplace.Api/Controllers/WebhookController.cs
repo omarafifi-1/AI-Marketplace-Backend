@@ -32,11 +32,11 @@ namespace AI_Marketplace.Controllers
         public async Task<IActionResult> HandleStripeWebhook()
         {
             var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
-            
+
             try
             {
                 var stripeSignature = Request.Headers["Stripe-Signature"];
-                
+
                 if (string.IsNullOrEmpty(stripeSignature))
                 {
                     _logger.LogWarning("Webhook received without Stripe signature");
@@ -52,10 +52,9 @@ namespace AI_Marketplace.Controllers
                     throwOnApiVersionMismatch: false
                 );
 
-                _logger.LogInformation("Webhook event type: {EventType}, ID: {EventId}", 
+                _logger.LogInformation("Webhook event type: {EventType}, ID: {EventId}",
                     stripeEvent.Type, stripeEvent.Id);
 
-                // Handle the event
                 switch (stripeEvent.Type)
                 {
                     case "payment_intent.succeeded":
@@ -79,7 +78,7 @@ namespace AI_Marketplace.Controllers
             }
             catch (StripeException ex)
             {
-                _logger.LogError(ex, "Stripe webhook signature verification failed");
+                _logger.LogWarning(ex, "Webhook signature verification failed");
                 return BadRequest($"Webhook signature verification failed: {ex.Message}");
             }
             catch (Exception ex)
@@ -104,7 +103,6 @@ namespace AI_Marketplace.Controllers
                 paymentIntent.Amount);
 
             var payment = await _paymentRepository.GetByPaymentIntentIdAsync(paymentIntent.Id);
-            
             if (payment == null)
             {
                 _logger.LogWarning(
@@ -113,7 +111,6 @@ namespace AI_Marketplace.Controllers
                 return;
             }
 
-            // Check if payment is already succeeded (idempotency)
             if (payment.Status == Domain.enums.PaymentStatus.Succeeded)
             {
                 _logger.LogInformation(
@@ -122,7 +119,6 @@ namespace AI_Marketplace.Controllers
                 return;
             }
 
-            // Update payment status
             payment.Status = Domain.enums.PaymentStatus.Succeeded;
             payment.TransactionId = paymentIntent.LatestChargeId;
             payment.ProcessedAt = DateTime.UtcNow;
@@ -135,18 +131,6 @@ namespace AI_Marketplace.Controllers
                 "Payment updated to Succeeded: PaymentId={PaymentId}, OrderId={OrderId}",
                 payment.Id,
                 payment.OrderId);
-
-            // Update order status from PendingPayment to Pending
-            var order = await _orderRepository.GetOrderByIdAsync(payment.OrderId, CancellationToken.None);
-            if (order != null && order.Status == "PendingPayment")
-            {
-                order.Status = "Pending";
-                await _orderRepository.UpdateOrderAsync(order, CancellationToken.None);
-
-                _logger.LogInformation(
-                    "Order status updated to Pending: OrderId={OrderId}",
-                    order.Id);
-            }
         }
 
         private async Task HandlePaymentIntentFailed(Event stripeEvent)
@@ -163,7 +147,6 @@ namespace AI_Marketplace.Controllers
                 paymentIntent.Id);
 
             var payment = await _paymentRepository.GetByPaymentIntentIdAsync(paymentIntent.Id);
-            
             if (payment == null)
             {
                 _logger.LogWarning(
@@ -172,7 +155,6 @@ namespace AI_Marketplace.Controllers
                 return;
             }
 
-            // Check if payment is already failed (idempotency)
             if (payment.Status == Domain.enums.PaymentStatus.Failed)
             {
                 _logger.LogInformation(
@@ -181,7 +163,6 @@ namespace AI_Marketplace.Controllers
                 return;
             }
 
-            // Update payment status
             payment.Status = Domain.enums.PaymentStatus.Failed;
             payment.FailureReason = paymentIntent.LastPaymentError?.Message ?? "Payment failed";
             payment.ProcessedAt = DateTime.UtcNow;
@@ -193,18 +174,6 @@ namespace AI_Marketplace.Controllers
                 "Payment updated to Failed: PaymentId={PaymentId}, Reason={Reason}",
                 payment.Id,
                 payment.FailureReason);
-
-            // Optionally cancel the order
-            var order = await _orderRepository.GetOrderByIdAsync(payment.OrderId, CancellationToken.None);
-            if (order != null && order.Status == "PendingPayment")
-            {
-                order.Status = "Cancelled";
-                await _orderRepository.UpdateOrderAsync(order, CancellationToken.None);
-
-                _logger.LogInformation(
-                    "Order cancelled due to payment failure: OrderId={OrderId}",
-                    order.Id);
-            }
         }
 
         private async Task HandleChargeRefunded(Event stripeEvent)
@@ -222,7 +191,6 @@ namespace AI_Marketplace.Controllers
                 charge.AmountRefunded);
 
             var payment = await _paymentRepository.GetByTransactionIdAsync(charge.Id);
-            
             if (payment == null)
             {
                 _logger.LogWarning(
@@ -231,12 +199,10 @@ namespace AI_Marketplace.Controllers
                 return;
             }
 
-            // Update refund information
             payment.RefundedAmount = charge.AmountRefunded;
             payment.RefundedAt = DateTime.UtcNow;
             payment.PaymentGatewayResponse = charge.ToJson();
 
-            // Update payment status based on refund amount
             if (charge.AmountRefunded >= payment.Amount)
             {
                 payment.Status = Domain.enums.PaymentStatus.Refunded;

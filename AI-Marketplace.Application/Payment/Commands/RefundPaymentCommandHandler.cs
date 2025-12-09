@@ -32,8 +32,16 @@ namespace AI_Marketplace.Application.Payment.Commands
                 throw new InvalidOperationException("Only succeeded payments can be refunded.");
             }
 
-            // Call Stripe refund API when implemented
-            var refundTransactionId = await _stripeService.CreateRefund(payment.PaymentIntentId, request.RefundAmount);
+            // Convert major units (e.g., USD/EGP) provided by API into smallest units for Stripe
+            var currency = payment.Currency?.ToUpperInvariant() ?? "USD";
+            long? refundAmountSmallest = null;
+            if (request.RefundAmount > 0)
+            {
+                refundAmountSmallest = ConvertToSmallestUnit(request.RefundAmount, currency);
+            }
+
+            // Call Stripe refund API
+            var refundTransactionId = await _stripeService.CreateRefund(payment.PaymentIntentId, refundAmountSmallest, cancellationToken);
 
             // Process refund in database
             var success = await _paymentRepository.ProcessRefundAsync(
@@ -69,6 +77,16 @@ namespace AI_Marketplace.Application.Payment.Commands
                 CreatedAt = payment.CreatedAt,
                 ProcessedAt = payment.ProcessedAt,
                 CompletedAt = payment.CompletedAt
+            };
+        }
+
+        private static long ConvertToSmallestUnit(long amountMajorUnits, string currency)
+        {
+            return currency switch
+            {
+                "JPY" => amountMajorUnits,
+                "KRW" => amountMajorUnits,
+                _ => checked(amountMajorUnits * 100)
             };
         }
     }

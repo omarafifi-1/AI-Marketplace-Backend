@@ -32,72 +32,28 @@ namespace AI_Marketplace.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> CreatePaymentIntentForUser([FromBody] PaymentDto paymentDto)
         {
-            if (paymentDto is null)
-            {
-                return BadRequest(ApiResponse<string>.Fail(new[] { "Request body is required" }, "Invalid request"));
-            }
-
-            if (paymentDto.OrderId <= 0)
-            {
-                return BadRequest(ApiResponse<string>.Fail(new[] { "OrderId must be a positive integer" }, "Invalid order id"));
-            }
-
-            if (paymentDto.Amount <= 0)
-            {
-                return BadRequest(ApiResponse<string>.Fail(new[] { "Amount must be greater than 0" }, "Invalid amount"));
-            }
-
-            if (string.IsNullOrWhiteSpace(paymentDto.CurrencyCode))
-            {
-                return BadRequest(ApiResponse<string>.Fail(new[] { "CurrencyCode is required" }, "Invalid currency"));
-            }
-
-            // Ensure we have an authenticated user and pass it to the command
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrWhiteSpace(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
-            {
-                return Unauthorized(ApiResponse<string>.Fail(new[] { "Unauthorized" }, "User not authenticated"));
-            }
-
             try
             {
                 var command = new CreatePaymentIntentCommand
                 {
                     OrderId = paymentDto.OrderId,
                     Amount = paymentDto.Amount,
-                    Currency = paymentDto.CurrencyCode,
-
+                    Currency = paymentDto.CurrencyCode
                 };
 
                 var clientSecret = await _mediator.Send(command);
-
-                if (string.IsNullOrWhiteSpace(clientSecret))
-                {
-                    return BadRequest(ApiResponse<string>.Fail(new[] { "Failed to create payment intent" }, "Payment intent creation failed"));
-                }
-
                 return Ok(ApiResponse<string>.Ok(clientSecret, "Payment intent created successfully. Use this client secret with Stripe.js"));
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                _logger.LogWarning(ex, "Unauthorized to create payment intent for OrderId {OrderId}", paymentDto.OrderId);
-                return Unauthorized(ApiResponse<string>.Fail(new[] { ex.Message }, "User not authorized"));
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogInformation(ex, "Business rule prevented creating payment intent for OrderId {OrderId}", paymentDto.OrderId);
                 return BadRequest(ApiResponse<string>.Fail(new[] { ex.Message }, "Payment intent creation failed"));
             }
-            catch (Exception ex)
+            catch
             {
-                _logger.LogError(ex, "Unexpected error creating payment intent for OrderId {OrderId}", paymentDto.OrderId);
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ApiResponse<string>.Fail(new[] { "An internal server error occurred" }, "Server error"));
-            }               
+            }
         }
-
-
-
 
         [HttpGet("{id}")]
         [Authorize(Roles = "Customer,Seller,Admin")]
