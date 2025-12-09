@@ -29,7 +29,7 @@ namespace AI_Marketplace.Application.Users.Commands
             }
 
             var email = WebUtility.UrlDecode(request.Email);
-            var token = WebUtility.UrlDecode(request.Token);
+            var token = WebUtility.UrlDecode(WebUtility.UrlDecode(request.Token)); // double decode fix
 
             var user = await _userManager.FindByEmailAsync(email);
 
@@ -49,7 +49,7 @@ namespace AI_Marketplace.Application.Users.Commands
                 return new ResetPasswordResponseDto
                 {
                     Succeeded = false,
-                    Message = "Failed to reset password. Token may be expired."
+                    Message = string.Join(", ", result.Errors.Select(e => e.Description))
                 };
             }
 
