@@ -108,7 +108,11 @@ namespace AI_Marketplace.Controllers
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto dto)
         {
             var result = await _mediator.Send(new ForgotPasswordQuery(dto.Email));
-            return Ok(result);
+            if (result.Message == "No user found with this email.")
+            {
+                return BadRequest(new { message = result.Message });
+            }
+            return Ok(new { message = result.Message });
         }
 
         [HttpPost("reset-password")]
