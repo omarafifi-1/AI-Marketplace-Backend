@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using AI_Marketplace.Domain.enums;
 
 namespace AI_Marketplace.Domain.Entities
 {
@@ -20,5 +21,6 @@ namespace AI_Marketplace.Domain.Entities
         public Offer? Offer { get; set; }
         public Store Store { get; set; } = null!;
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public ICollection<Payment> Payments { get; set; } = new List<Payment>();
     }
 }

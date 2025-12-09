@@ -20,5 +20,6 @@ namespace AI_Marketplace.Domain.Entities
         // Calculated Properties
         public decimal TotalAmount => CartItems.Sum(item => item.TotalPrice);
         public int TotalItems => CartItems.Sum(item => item.Quantity);
+
     }
 }

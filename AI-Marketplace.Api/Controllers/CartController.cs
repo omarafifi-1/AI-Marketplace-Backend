@@ -46,7 +46,7 @@ namespace AI_Marketplace.Controllers
         }
 
         [HttpPost("add")]
-        [Authorize]
+        [Authorize(Roles = "Customer, Admin")]
         [ProducesResponseType(typeof(ApiResponse<CartDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> AddProductToCart([FromBody] AddProductToCartDto dto)
         {

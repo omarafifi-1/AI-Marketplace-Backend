@@ -25,7 +25,8 @@ namespace AI_Marketplace.Infrastructure.Data
         public DbSet<ChatSession> ChatSessions { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<Cart> Carts { get; set; } 
-        public DbSet<CartItem> CartItems { get; set; } 
+        public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<Payment> Payments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -260,6 +261,48 @@ namespace AI_Marketplace.Infrastructure.Data
                     .IsUnique();
 
                 entity.Ignore(e => e.TotalPrice); // Calculated property
+            });
+
+            // Payment Configuration
+            modelBuilder.Entity<Payment>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                
+                entity.Property(e => e.PaymentMethod)
+                    .IsRequired()
+                    .HasConversion<string>();
+                
+                entity.Property(e => e.Status)
+                    .IsRequired()
+                    .HasConversion<string>();
+                
+                entity.Property(e => e.Currency)
+                    .IsRequired()
+                    .HasMaxLength(3);
+                
+                entity.Property(e => e.PaymentIntentId)
+                    .HasMaxLength(255);
+                
+                entity.Property(e => e.TransactionId)
+                    .HasMaxLength(255);
+                
+                entity.Property(e => e.RefundTransactionId)
+                    .HasMaxLength(255);
+                
+                entity.Property(e => e.CustomerEmail)
+                    .HasMaxLength(256);
+                
+                entity.Property(e => e.CustomerName)
+                    .HasMaxLength(200);
+
+                entity.HasOne(e => e.Order)
+                    .WithMany(o => o.Payments)
+                    .HasForeignKey(e => e.OrderId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(e => e.PaymentIntentId);
+                entity.HasIndex(e => e.TransactionId);
+                entity.HasIndex(e => e.OrderId);
             });
         }
     }
