@@ -122,6 +122,10 @@ namespace AI_Marketplace.Controllers
             );
 
             var result = await _mediator.Send(command);
+
+            if (!result.Succeeded)
+                return BadRequest(result);  
+
             return Ok(result);
         }
 
