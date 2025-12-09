@@ -1,6 +1,7 @@
 ﻿using AI_Marketplace.Application.Users.Commands;
 using AI_Marketplace.Application.Users.Commands.UpdateUserProfile;
 using AI_Marketplace.Application.Users.DTOs;
+using AI_Marketplace.Application.Users.Queries;
 using AI_Marketplace.Application.Users.Queries.GetAllUsers;
 using AI_Marketplace.Application.Users.Queries.GetUserProfile;
 using MediatR;
@@ -102,5 +103,27 @@ namespace AI_Marketplace.Controllers
 
             return Ok(result);
         }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto dto)
+        {
+            var result = await _mediator.Send(new ForgotPasswordQuery(dto.Email));
+            return Ok(result);
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto dto)
+        {
+            var command = new ResetPasswordCommand(
+                dto.Email,
+                dto.Token,
+                dto.NewPassword,
+                dto.ConfirmPassword
+            );
+
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
     }
 }

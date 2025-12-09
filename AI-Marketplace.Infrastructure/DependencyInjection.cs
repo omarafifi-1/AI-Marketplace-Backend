@@ -11,6 +11,7 @@ using AI_Marketplace.Infrastructure.Repositories.Orders;
 using AI_Marketplace.Infrastructure.Repositories.Payments;
 using AI_Marketplace.Infrastructure.Repositories.Products;
 using AI_Marketplace.Infrastructure.Repositories.Stores;
+using AI_Marketplace.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -70,6 +71,9 @@ namespace AI_Marketplace.Infrastructure
 
             // Register your abstraction
             services.AddScoped<IStripePaymentService, StripePaymentService>();
+
+            // Register Email Service
+            services.AddTransient<IEmailService, SmtpEmailService>();
 
             return services;
         }

@@ -25,6 +25,7 @@ namespace AI_Marketplace.Infrastructure.Data
         public DbSet<ChatSession> ChatSessions { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<Cart> Carts { get; set; } 
+        public DbSet<Address> Addresses { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Payment> Payments { get; set; }
 
@@ -156,6 +157,11 @@ namespace AI_Marketplace.Infrastructure.Data
                     .WithOne(o => o.Order)
                     .HasForeignKey<Order>(e => e.OfferId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.ShippingAddressEntity)
+                    .WithMany(a => a.Orders)
+                    .HasForeignKey(e => e.ShippingAddressId)
+                    .OnDelete(DeleteBehavior.NoAction);
             });
 
             // OrderItem Configuration
@@ -261,6 +267,29 @@ namespace AI_Marketplace.Infrastructure.Data
                     .IsUnique();
 
                 entity.Ignore(e => e.TotalPrice); // Calculated property
+            });
+
+            // Address configuration
+            modelBuilder.Entity<Address>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Street).IsRequired().HasMaxLength(500);
+                entity.Property(e => e.City).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.PostalCode).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Country).IsRequired().HasMaxLength(200);
+
+                entity.HasOne(e => e.User)
+                    .WithMany(u => u.Addresses)
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(e => e.Store)
+                    .WithMany(s => s.Addresses)
+                    .HasForeignKey(e => e.StoreId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasIndex(e => new { e.UserId, e.IsPrimary }).HasFilter(null);
             });
 
             // Payment Configuration
