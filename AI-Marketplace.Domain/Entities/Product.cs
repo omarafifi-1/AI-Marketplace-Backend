@@ -25,5 +25,6 @@ namespace AI_Marketplace.Domain.Entities
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
+        public ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
     }
 }

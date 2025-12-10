@@ -12,6 +12,7 @@ using AI_Marketplace.Infrastructure.Repositories.Orders;
 using AI_Marketplace.Infrastructure.Repositories.Payments;
 using AI_Marketplace.Infrastructure.Repositories.Products;
 using AI_Marketplace.Infrastructure.Repositories.Stores;
+using AI_Marketplace.Infrastructure.Repositories.Wishlist;
 using AI_Marketplace.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -42,6 +43,7 @@ namespace AI_Marketplace.Infrastructure
             services.AddScoped<ICustomRequestRepository, CustomRequestRepository>();
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
+            services.AddScoped<IWishlistRepository, WishlistRepository>();
 
             // Register JWT Token Service
             services.AddScoped<IJwtTokenService, JwtTokenService>();
