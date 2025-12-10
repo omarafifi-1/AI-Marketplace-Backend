@@ -20,5 +20,6 @@ namespace AI_Marketplace.Domain.Entities
         public ICollection<ChatSession> ChatSessions { get; set; } = new List<ChatSession>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public ICollection<Address> Addresses { get; set; } = new List<Address>();
+        public ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
     }
 }

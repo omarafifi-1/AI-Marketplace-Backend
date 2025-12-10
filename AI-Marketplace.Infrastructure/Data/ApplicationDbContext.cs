@@ -28,6 +28,7 @@ namespace AI_Marketplace.Infrastructure.Data
         public DbSet<Address> Addresses { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<Wishlist> Wishlists { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -329,6 +330,26 @@ namespace AI_Marketplace.Infrastructure.Data
                 entity.HasIndex(e => e.PaymentIntentId);
                 entity.HasIndex(e => e.TransactionId);
                 entity.HasIndex(e => e.OrderId);
+            });
+
+            // Wishlist Configuration
+            modelBuilder.Entity<Wishlist>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasOne(e => e.User)
+                    .WithMany(u => u.Wishlists)
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Product)
+                    .WithMany(p => p.Wishlists)
+                    .HasForeignKey(e => e.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // Prevent duplicate products in same user's wishlist
+                entity.HasIndex(e => new { e.UserId, e.ProductId })
+                    .IsUnique();
             });
         }
     }
