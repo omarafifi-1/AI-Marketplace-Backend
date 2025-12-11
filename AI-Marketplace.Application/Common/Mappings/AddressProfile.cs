@@ -12,7 +12,8 @@ namespace AI_Marketplace.Application.Common.Mappings
         public AddressProfile()
         {
             CreateMap<Address, AddressResponseDto>();
-            CreateMap<CreateAddressRequestDto, Address>();
+            CreateMap<CreateAddressRequestDto, Address>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore());
             CreateMap<UpdateAddressRequestDto, Address>();
         }
     }

@@ -12,6 +12,5 @@ namespace AI_Marketplace.Application.Addresses.DTOs
         public string PostalCode { get; set; } = string.Empty;
         public string Country { get; set; } = string.Empty;
         public bool IsPrimary { get; set; }
-        public int UserId { get; set; }
     }
 }
