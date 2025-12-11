@@ -19,6 +19,7 @@ namespace AI_Marketplace.Infrastructure.Data
         public DbSet<CustomRequest> CustomRequests { get; set; }
         public DbSet<GeneratedImage> GeneratedImages { get; set; }
         public DbSet<Offer> Offers { get; set; }
+        public DbSet<MasterOrder> MasterOrders { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Review> Reviews { get; set; }
@@ -141,6 +142,24 @@ namespace AI_Marketplace.Infrastructure.Data
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
+            // MasterOrder Configuration
+            modelBuilder.Entity<MasterOrder>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.TotalAmount).HasPrecision(18, 2);
+                entity.Property(e => e.Status).HasMaxLength(50);
+
+                entity.HasOne(e => e.Buyer)
+                    .WithMany()
+                    .HasForeignKey(e => e.BuyerId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.ShippingAddressEntity)
+                    .WithMany()
+                    .HasForeignKey(e => e.ShippingAddressId)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
+
             // Order Configuration
             modelBuilder.Entity<Order>(entity =>
             {
@@ -162,6 +181,11 @@ namespace AI_Marketplace.Infrastructure.Data
                     .WithMany(a => a.Orders)
                     .HasForeignKey(e => e.ShippingAddressId)
                     .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(e => e.MasterOrder)
+                    .WithMany(mo => mo.ChildOrders)
+                    .HasForeignKey(e => e.MasterOrderId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             // OrderItem Configuration
@@ -326,9 +350,15 @@ namespace AI_Marketplace.Infrastructure.Data
                     .HasForeignKey(e => e.OrderId)
                     .OnDelete(DeleteBehavior.Restrict);
 
+                entity.HasOne(e => e.MasterOrder)
+                    .WithMany(mo => mo.Payments)
+                    .HasForeignKey(e => e.MasterOrderId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
                 entity.HasIndex(e => e.PaymentIntentId);
                 entity.HasIndex(e => e.TransactionId);
                 entity.HasIndex(e => e.OrderId);
+                entity.HasIndex(e => e.MasterOrderId);
             });
         }
     }

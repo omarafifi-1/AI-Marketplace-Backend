@@ -7,6 +7,7 @@ namespace AI_Marketplace.Application.Orders.DTOs
     public class OrderDto
     {
         public int Id { get; set; }
+        public int? MasterOrderId { get; set; }
         public decimal TotalAmount { get; set; }
         public string Status { get; set; } = string.Empty;
         public string? ShippingAddress { get; set; }

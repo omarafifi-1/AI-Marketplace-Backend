@@ -64,6 +64,7 @@ namespace AI_Marketplace.Application.Payment.Commands
             {
                 Id = payment.Id,
                 OrderId = payment.OrderId,
+                MasterOrderId = payment.MasterOrderId,
                 PaymentMethod = payment.PaymentMethod.ToString(),
                 PaymentIntentId = payment.PaymentIntentId,
                 TransactionId = payment.TransactionId,

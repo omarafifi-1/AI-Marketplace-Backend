@@ -39,6 +39,7 @@ namespace AI_Marketplace.Infrastructure
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<ICartRepository, CartRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IMasterOrderRepository, MasterOrderRepository>();
             services.AddScoped<ICustomRequestRepository, CustomRequestRepository>();
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();

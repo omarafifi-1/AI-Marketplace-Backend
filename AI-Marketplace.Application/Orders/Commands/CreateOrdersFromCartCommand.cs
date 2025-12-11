@@ -3,7 +3,7 @@ using MediatR;
 
 namespace AI_Marketplace.Application.Orders.Commands
 {
-    public class CreateOrdersFromCartCommand : IRequest<List<OrderDto>>
+    public class CreateOrdersFromCartCommand : IRequest<CreateOrdersResponse>
     {
         public int UserId { get; }
         public int? CartId { get; }
