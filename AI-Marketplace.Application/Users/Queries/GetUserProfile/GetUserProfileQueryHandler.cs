@@ -4,6 +4,7 @@ using AI_Marketplace.Domain.Entities;
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -26,6 +27,11 @@ namespace AI_Marketplace.Application.Users.Queries.GetUserProfile
             var user = await _userManager.FindByIdAsync(request.UserId.ToString());
             if (user == null)
                 throw new NotFoundException(new Dictionary<string, string[]> { { "User", new[] { $"User with id {request.UserId} not found." } } });
+
+            user = await _userManager.Users
+                .Where(u => u.Id == request.UserId)
+                .Include(u => u.Addresses)
+                .FirstOrDefaultAsync(cancellationToken);
 
             return _mapper.Map<GetUserProfileDto>(user);
         }

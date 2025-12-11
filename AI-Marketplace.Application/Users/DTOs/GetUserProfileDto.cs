@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AI_Marketplace.Application.Addresses.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -16,6 +17,8 @@ namespace AI_Marketplace.Application.Users.DTOs
         // Custom fields
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
+
+        public List<AddressResponseDto> Addresses { get; set; } = new();
 
     }
 }
