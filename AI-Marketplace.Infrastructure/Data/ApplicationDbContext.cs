@@ -161,6 +161,24 @@ namespace AI_Marketplace.Infrastructure.Data
                     .OnDelete(DeleteBehavior.NoAction);
             });
 
+            // MasterOrder Configuration
+            modelBuilder.Entity<MasterOrder>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.TotalAmount).HasPrecision(18, 2);
+                entity.Property(e => e.Status).HasMaxLength(50);
+
+                entity.HasOne(e => e.Buyer)
+                    .WithMany()
+                    .HasForeignKey(e => e.BuyerId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.ShippingAddressEntity)
+                    .WithMany()
+                    .HasForeignKey(e => e.ShippingAddressId)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
+
             // Order Configuration
             modelBuilder.Entity<Order>(entity =>
             {
