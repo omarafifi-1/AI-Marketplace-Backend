@@ -7,9 +7,9 @@ namespace AI_Marketplace.Application.Payment.DTO
 {
     public class PaymentDto
     {
-        [Required(ErrorMessage = "Order ID is required.")]
-        [Range(1, int.MaxValue, ErrorMessage = "Order ID must be greater than 0.")]
-        public int OrderId { get; set; }
+        [Required(ErrorMessage = "Master Order ID is required.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Master Order ID must be greater than 0.")]
+        public int MasterOrderId { get; set; }
 
         [Required(ErrorMessage = "Amount is required.")]
         [Range(1, long.MaxValue, ErrorMessage = "Amount must be greater than 0.")]

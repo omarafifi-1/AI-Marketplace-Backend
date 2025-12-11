@@ -10,6 +10,11 @@ namespace AI_Marketplace.Domain.Entities
         public int BuyerId { get; set; }
         public int StoreId { get; set; }
         public int? OfferId { get; set; }
+        
+        // Master Order relationship (optional - only for cart-based orders)
+        public int? MasterOrderId { get; set; }
+        public MasterOrder? MasterOrder { get; set; }
+        
         public decimal TotalAmount { get; set; }
         public string Status { get; set; } = "Pending"; // Pending, Processing, Shipped, Delivered, Cancelled
 

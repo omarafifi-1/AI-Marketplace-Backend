@@ -12,25 +12,25 @@ namespace AI_Marketplace.Application.Payment.Commands
     {
         private readonly IStripePaymentService _stripe;
         private readonly IPaymentRepository _paymentRepository;
-        private readonly IOrderRepository _orderRepository;
+        private readonly IMasterOrderRepository _masterOrderRepository;
 
         public CreatePaymentIntentCommandHandler(
             IStripePaymentService stripe,
             IPaymentRepository paymentRepository,
-            IOrderRepository orderRepository)
+            IMasterOrderRepository masterOrderRepository)
         {
             _stripe = stripe;
             _paymentRepository = paymentRepository;
-            _orderRepository = orderRepository;
+            _masterOrderRepository = masterOrderRepository;
         }
 
         public async Task<string> Handle(CreatePaymentIntentCommand request, CancellationToken cancellationToken)
         {
-            // Verify order exists
-            var order = await _orderRepository.GetOrderByIdAsync(request.OrderId, cancellationToken);
-            if (order == null)
+            // Verify master order exists and get buyer info
+            var masterOrder = await _masterOrderRepository.GetByIdAsync(request.MasterOrderId, cancellationToken);
+            if (masterOrder == null)
             {
-                throw new InvalidOperationException($"Order with ID {request.OrderId} not found.");
+                throw new InvalidOperationException($"Master Order with ID {request.MasterOrderId} not found.");
             }
 
             // Validate inputs (amount is in major units like USD dollars)
@@ -53,14 +53,14 @@ namespace AI_Marketplace.Application.Payment.Commands
 
                 var payment = new Domain.Entities.Payment
                 {
-                    OrderId = request.OrderId,
+                    MasterOrderId = request.MasterOrderId,
                     PaymentMethod = PaymentMethod.Stripe,
                     PaymentIntentId = intent.PaymentIntentId,
                     Amount = request.Amount, 
                     Currency = currency,
                     Status = PaymentStatus.Pending,
-                    CustomerEmail = order.Buyer?.Email,
-                    CustomerName = $"{order.Buyer?.FirstName} {order.Buyer?.LastName}".Trim(),
+                    CustomerEmail = masterOrder.Buyer?.Email,
+                    CustomerName = $"{masterOrder.Buyer?.FirstName} {masterOrder.Buyer?.LastName}".Trim(),
                     CreatedAt = DateTime.UtcNow
                 };
 

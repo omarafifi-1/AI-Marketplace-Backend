@@ -6,7 +6,10 @@ namespace AI_Marketplace.Domain.Entities
     public class Payment
     {
         public int Id { get; set; }
-        public int OrderId { get; set; }
+        
+        // Payment can be associated with either a single Order OR a MasterOrder
+        public int? OrderId { get; set; }
+        public int? MasterOrderId { get; set; }
         
         // Payment Gateway Information
         public PaymentMethod PaymentMethod { get; set; }
@@ -37,6 +40,7 @@ namespace AI_Marketplace.Domain.Entities
         public DateTime? CompletedAt { get; set; }
         
         // Navigation Properties
-        public Order Order { get; set; } = null!;
+        public Order? Order { get; set; }
+        public MasterOrder? MasterOrder { get; set; }
     }
 }
