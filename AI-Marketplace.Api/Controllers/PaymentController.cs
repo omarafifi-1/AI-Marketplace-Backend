@@ -36,7 +36,7 @@ namespace AI_Marketplace.Controllers
             {
                 var command = new CreatePaymentIntentCommand
                 {
-                    OrderId = paymentDto.OrderId,
+                    MasterOrderId = paymentDto.MasterOrderId,
                     Amount = paymentDto.Amount,
                     Currency = paymentDto.CurrencyCode
                 };

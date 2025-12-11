@@ -1,14 +1,18 @@
 ﻿using AI_Marketplace.Application.Addresses.Commands;
 using AI_Marketplace.Application.Addresses.DTOs;
 using AI_Marketplace.Application.Addresses.Queries;
+using AI_Marketplace.Application.Common.DTOs;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AI_Marketplace.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles="Customer, Admin")]
     public class AddressesController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -19,9 +23,32 @@ namespace AI_Marketplace.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAddress(CreateAddressRequestDto dto)
+        public async Task<IActionResult> CreateAddress(CreateAddressDto dto)
         {
-            var result = await _mediator.Send(new CreateAddressCommand(dto));
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+
+            if (!int.TryParse(userIdString, out var userId))
+            {
+                return BadRequest("Invalid User ID");
+            }
+
+            var command = new CreateAddressCommand(new CreateAddressRequestDto
+            {
+                City = dto.City,
+                Country = dto.Country,
+                IsPrimary = dto.IsPrimary,
+                PostalCode = dto.PostalCode,
+                State = dto.State,
+                Street = dto.Street,
+                UserId = userId
+            });
+
+            var result = await _mediator.Send(command);
+
             return Ok(result);
         }
 
@@ -55,11 +82,21 @@ namespace AI_Marketplace.Controllers
             return result == null ? NotFound() : Ok(result);
         }
 
-        [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetAddressesByUserId(int userId)
+        [HttpGet("user")]
+        public async Task<IActionResult> GetAddressesForLoggedUser()
         {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+
+            if (!int.TryParse(userIdString, out var userId))
+            {
+                return BadRequest("Invalid User ID");
+            }
             var result = await _mediator.Send(new GetAddressesByUserIdQuery(userId));
-            return Ok(result);
+            return Ok(ApiResponse<object>.Ok(result , "Addresses retrieved successfully"));
         }
     }
 }

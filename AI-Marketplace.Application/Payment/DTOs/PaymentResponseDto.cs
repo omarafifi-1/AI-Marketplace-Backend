@@ -5,7 +5,8 @@ namespace AI_Marketplace.Application.Payment.DTOs
     public class PaymentResponseDto
     {
         public int Id { get; set; }
-        public int OrderId { get; set; }
+        public int? OrderId { get; set; }
+        public int? MasterOrderId { get; set; }
         public string PaymentMethod { get; set; } = string.Empty;
         public string? PaymentIntentId { get; set; }
         public string? TransactionId { get; set; }

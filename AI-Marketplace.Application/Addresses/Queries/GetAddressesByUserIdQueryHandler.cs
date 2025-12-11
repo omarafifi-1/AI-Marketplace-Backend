@@ -1,13 +1,14 @@
 ﻿using AI_Marketplace.Application.Addresses.DTOs;
 using AI_Marketplace.Application.Common.Interfaces;
 using AutoMapper;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace AI_Marketplace.Application.Addresses.Queries
 {
-    public class GetAddressesByUserIdQueryHandler
+    public class GetAddressesByUserIdQueryHandler : IRequestHandler<GetAddressesByUserIdQuery, IEnumerable<AddressResponseDto>>
     {
         private readonly IAddressRepository _repo;
         private readonly IMapper _mapper;
