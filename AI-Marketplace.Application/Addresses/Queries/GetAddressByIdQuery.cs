@@ -6,7 +6,7 @@ using System.Text;
 
 namespace AI_Marketplace.Application.Addresses.Queries
 {
-    public class GetAddressByIdQuery : IRequest<AddressResponseDto>
+    public class GetAddressByIdQuery : IRequest<CreateAddressDto>
     {
         public int Id { get; }
 

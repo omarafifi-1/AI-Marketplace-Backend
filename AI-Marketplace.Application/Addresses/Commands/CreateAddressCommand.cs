@@ -6,7 +6,7 @@ using System.Text;
 
 namespace AI_Marketplace.Application.Addresses.Commands
 {
-    public class CreateAddressCommand : IRequest<AddressResponseDto>
+    public class CreateAddressCommand : IRequest<CreateAddressDto>
     {
         public CreateAddressRequestDto AddressDto { get; set; }
         public CreateAddressCommand(CreateAddressRequestDto addressDto)

@@ -55,7 +55,16 @@ namespace AI_Marketplace.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateAddress(UpdateAddressRequestDto dto)
         {
-            var result = await _mediator.Send(new UpdateAddressCommand(dto));
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdString == null)
+                return Unauthorized();
+
+            if (!int.TryParse(userIdString, out var userId))
+                return BadRequest("Invalid User ID");
+
+            var result = await _mediator.Send(
+                new UpdateAddressCommand(userId, dto)
+            );
 
             if (result == null)
                 return NotFound("Address not found.");

@@ -322,12 +322,12 @@ namespace AI_Marketplace.Infrastructure.Data
                 entity.Property(e => e.PostalCode).IsRequired().HasMaxLength(50);
                 entity.Property(e => e.Country).IsRequired().HasMaxLength(200);
 
-                entity.HasOne(e => e.User)
-                    .WithMany(u => u.Addresses)
-                    .HasForeignKey(e => e.UserId)
-                    .OnDelete(DeleteBehavior.NoAction);
+                entity.HasOne(a => a.User)
+                       .WithMany(u => u.Addresses)
+                       .HasForeignKey(a => a.UserId)
+                       .OnDelete(DeleteBehavior.Cascade);
 
-               
+
 
                 entity.HasIndex(e => new { e.UserId, e.IsPrimary }).HasFilter(null);
             });
