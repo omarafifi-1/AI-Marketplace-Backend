@@ -22,11 +22,24 @@ namespace AI_Marketplace.Application.Addresses.Commands
 
         public async Task<AddressResponseDto?> Handle(UpdateAddressCommand request, CancellationToken cancellationToken)
         {
-            var address = _mapper.Map<Address>(request.AddressDto);
+            var address = await _repo.GetAddressByIdAsync(request.AddressDto.Id);
 
-            var updated = await _repo.UpdateAddressAsync(address);
+            if (address == null)
+                return null;
 
-            return updated == null ? null : _mapper.Map<AddressResponseDto>(updated);
+            if (address.UserId != request.UserId)
+                throw new UnauthorizedAccessException("You cannot edit this address");
+
+            address.Street = request.AddressDto.Street;
+            address.City = request.AddressDto.City;
+            address.State = request.AddressDto.State;
+            address.PostalCode = request.AddressDto.PostalCode;
+            address.Country = request.AddressDto.Country;
+            address.IsPrimary = request.AddressDto.IsPrimary;
+
+            await _repo.UpdateAddressAsync(address);
+
+            return _mapper.Map<AddressResponseDto>(address);
         }
     }
 }

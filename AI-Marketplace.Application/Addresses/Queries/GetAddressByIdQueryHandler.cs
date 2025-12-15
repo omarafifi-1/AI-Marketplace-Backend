@@ -8,7 +8,7 @@ using System.Text;
 
 namespace AI_Marketplace.Application.Addresses.Queries
 {
-    public class GetAddressByIdQueryHandler : IRequestHandler<GetAddressByIdQuery, AddressResponseDto?>
+    public class GetAddressByIdQueryHandler : IRequestHandler<GetAddressByIdQuery, CreateAddressDto?>
     {
         private readonly IAddressRepository _repo;
         private readonly IMapper _mapper;
@@ -19,11 +19,11 @@ namespace AI_Marketplace.Application.Addresses.Queries
             _mapper = mapper;
         }
 
-        public async Task<AddressResponseDto?> Handle(GetAddressByIdQuery request, CancellationToken cancellationToken)
+        public async Task<CreateAddressDto?> Handle(GetAddressByIdQuery request, CancellationToken cancellationToken)
         {
             var address = await _repo.GetAddressByIdAsync(request.Id);
 
-            return address == null ? null : _mapper.Map<AddressResponseDto>(address);
+            return address == null ? null : _mapper.Map<CreateAddressDto>(address);
         }
     }
 }
