@@ -20,8 +20,6 @@ namespace AI_Marketplace.Controllers
             
         }
 
-
-
         [HttpGet]
         public async Task<ActionResult> GetAllProducts
             (
