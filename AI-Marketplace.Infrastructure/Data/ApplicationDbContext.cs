@@ -96,7 +96,9 @@ namespace AI_Marketplace.Infrastructure.Data
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Description).IsRequired().HasMaxLength(2000);
-                entity.Property(e => e.Status).HasMaxLength(50);
+                entity.Property(e => e.Status)
+                      .IsRequired()
+                      .HasConversion<string>();
 
                 entity.HasOne(e => e.Buyer)
                     .WithMany(u => u.CustomRequests)
@@ -107,6 +109,10 @@ namespace AI_Marketplace.Infrastructure.Data
                     .WithMany(c => c.CustomRequests)
                     .HasForeignKey(e => e.CategoryId)
                     .OnDelete(DeleteBehavior.Restrict);
+                // add ImageUrl,Budget,Deadline properties
+                entity.Property(e => e.ImageUrl).HasMaxLength(500);
+                entity.Property(e => e.Budget).HasPrecision(18, 2);       
+                entity.Property(e => e.Deadline).HasColumnType("datetime2");
             });
 
             // GeneratedImage Configuration
