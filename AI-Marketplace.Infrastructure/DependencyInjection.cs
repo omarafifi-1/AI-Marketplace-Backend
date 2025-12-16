@@ -7,6 +7,7 @@ using AI_Marketplace.Infrastructure.Repositories.Stores;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using AI_Marketplace.Infrastructure.Repositories.ChatSessions;
 
 namespace AI_Marketplace.Infrastructure
 {
@@ -24,6 +25,7 @@ namespace AI_Marketplace.Infrastructure
             // Register Repositories
             services.AddScoped<IStoreRepository, StoreRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IChatSessionRepository, ChatSessionRepository>();
 
             // Register JWT Token Service
             services.AddScoped<IJwtTokenService, JwtTokenService>();
