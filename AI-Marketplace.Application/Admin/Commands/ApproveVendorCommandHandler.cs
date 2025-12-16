@@ -29,6 +29,7 @@ namespace AI_Marketplace.Application.Admin.Commands
                     { "Store", new[] { "Store Not Found." } }
                 });
             }
+            store.IsActive = true;
             store.IsVerified = true;
             store.VerifiedAt = DateOnly.FromDateTime(DateTime.UtcNow);
             var user = await _userManager.FindByIdAsync(request.AdminId.ToString());

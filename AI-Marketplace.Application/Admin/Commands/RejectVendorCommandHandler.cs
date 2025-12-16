@@ -30,6 +30,7 @@ namespace AI_Marketplace.Application.Admin.Commands
                 });
             }
             store.IsVerified = false;
+            store.IsActive = false;
             store.VerifiedAt = DateOnly.MinValue;
             store.VerifiedBy = string.Empty;
             await _storeRepository.UpdateAsync(store, cancellationToken);
