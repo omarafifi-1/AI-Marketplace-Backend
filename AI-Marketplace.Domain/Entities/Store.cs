@@ -16,6 +16,8 @@ namespace AI_Marketplace.Domain.Entities
         public string? Address { get; set; }
         public bool IsActive { get; set; } = true;
         public bool IsVerified { get; set; } = false;
+        public DateOnly VerifiedAt { get; set; }
+        public string VerifiedBy { get; set; } = string.Empty;
         public decimal Rating { get; set; } = 0;
         public int TotalReviews { get; set; } = 0;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -26,5 +28,6 @@ namespace AI_Marketplace.Domain.Entities
         public ICollection<Product> Products { get; set; } = new List<Product>();
         public ICollection<Offer> Offers { get; set; } = new List<Offer>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
+        public ICollection<Address> Addresses { get; set; } = new List<Address>();
     }
 }

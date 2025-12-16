@@ -11,6 +11,7 @@ namespace AI_Marketplace.Infrastructure.Data
         {
         }
 
+        //Corresponding table entities inside my database 
         public DbSet<Store> Stores { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
@@ -18,11 +19,17 @@ namespace AI_Marketplace.Infrastructure.Data
         public DbSet<CustomRequest> CustomRequests { get; set; }
         public DbSet<GeneratedImage> GeneratedImages { get; set; }
         public DbSet<Offer> Offers { get; set; }
+        public DbSet<MasterOrder> MasterOrders { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<ChatSession> ChatSessions { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
+        public DbSet<Cart> Carts { get; set; } 
+        public DbSet<Address> Addresses { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<Payment> Payments { get; set; }
+        public DbSet<Wishlist> Wishlists { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,7 +41,7 @@ namespace AI_Marketplace.Infrastructure.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.StoreName).IsRequired().HasMaxLength(200);
                 entity.Property(e => e.Rating).HasPrecision(3, 2);
-                
+
                 entity.HasOne(e => e.Owner)
                     .WithOne(u => u.Store)
                     .HasForeignKey<Store>(e => e.OwnerId)
@@ -122,6 +129,9 @@ namespace AI_Marketplace.Infrastructure.Data
                 entity.Property(e => e.ProposedPrice).HasPrecision(18, 2);
                 entity.Property(e => e.Status).HasMaxLength(50);
 
+                entity.HasIndex(e => new { e.CustomRequestId, e.StoreId })
+                      .IsUnique();
+
                 entity.HasOne(e => e.CustomRequest)
                     .WithMany(cr => cr.Offers)
                     .HasForeignKey(e => e.CustomRequestId)
@@ -131,6 +141,42 @@ namespace AI_Marketplace.Infrastructure.Data
                     .WithMany(s => s.Offers)
                     .HasForeignKey(e => e.StoreId)
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // MasterOrder Configuration
+            modelBuilder.Entity<MasterOrder>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.TotalAmount).HasPrecision(18, 2);
+                entity.Property(e => e.Status).HasMaxLength(50);
+
+                entity.HasOne(e => e.Buyer)
+                    .WithMany()
+                    .HasForeignKey(e => e.BuyerId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.ShippingAddressEntity)
+                    .WithMany()
+                    .HasForeignKey(e => e.ShippingAddressId)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
+
+            // MasterOrder Configuration
+            modelBuilder.Entity<MasterOrder>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.TotalAmount).HasPrecision(18, 2);
+                entity.Property(e => e.Status).HasMaxLength(50);
+
+                entity.HasOne(e => e.Buyer)
+                    .WithMany()
+                    .HasForeignKey(e => e.BuyerId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.ShippingAddressEntity)
+                    .WithMany()
+                    .HasForeignKey(e => e.ShippingAddressId)
+                    .OnDelete(DeleteBehavior.NoAction);
             });
 
             // Order Configuration
@@ -148,6 +194,16 @@ namespace AI_Marketplace.Infrastructure.Data
                 entity.HasOne(e => e.Offer)
                     .WithOne(o => o.Order)
                     .HasForeignKey<Order>(e => e.OfferId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.ShippingAddressEntity)
+                    .WithMany(a => a.Orders)
+                    .HasForeignKey(e => e.ShippingAddressId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(e => e.MasterOrder)
+                    .WithMany(mo => mo.ChildOrders)
+                    .HasForeignKey(e => e.MasterOrderId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
@@ -214,6 +270,134 @@ namespace AI_Marketplace.Infrastructure.Data
                     .WithMany(cs => cs.ChatMessages)
                     .HasForeignKey(e => e.ChatSessionId)
                     .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<Cart>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasOne(e => e.User)
+                    .WithOne(u => u.Cart)
+                    .HasForeignKey<Cart>(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(e => e.UserId)
+                    .IsUnique(); 
+
+                entity.Ignore(e => e.TotalAmount); 
+                entity.Ignore(e => e.TotalItems);  
+            });
+
+            modelBuilder.Entity<CartItem>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.UnitPrice)
+                    .HasPrecision(18, 2);
+
+                entity.HasOne(e => e.Cart)
+                    .WithMany(c => c.CartItems)
+                    .HasForeignKey(e => e.CartId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Product)
+                    .WithMany(p => p.CartItems)
+                    .HasForeignKey(e => e.ProductId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // Prevent duplicate products in same cart
+                entity.HasIndex(e => new { e.CartId, e.ProductId })
+                    .IsUnique();
+
+                entity.Ignore(e => e.TotalPrice); // Calculated property
+            });
+
+            // Address configuration
+            modelBuilder.Entity<Address>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Street).IsRequired().HasMaxLength(500);
+                entity.Property(e => e.City).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.PostalCode).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Country).IsRequired().HasMaxLength(200);
+
+                entity.HasOne(a => a.User)
+                       .WithMany(u => u.Addresses)
+                       .HasForeignKey(a => a.UserId)
+                       .OnDelete(DeleteBehavior.Cascade);
+
+
+
+                entity.HasIndex(e => new { e.UserId, e.IsPrimary }).HasFilter(null);
+            });
+
+            // Payment Configuration
+            modelBuilder.Entity<Payment>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                
+                entity.Property(e => e.PaymentMethod)
+                    .IsRequired()
+                    .HasConversion<string>();
+                
+                entity.Property(e => e.Status)
+                    .IsRequired()
+                    .HasConversion<string>();
+                
+                entity.Property(e => e.Currency)
+                    .IsRequired()
+                    .HasMaxLength(3);
+                
+                entity.Property(e => e.PaymentIntentId)
+                    .HasMaxLength(255);
+                
+                entity.Property(e => e.TransactionId)
+                    .HasMaxLength(255);
+                
+                entity.Property(e => e.RefundTransactionId)
+                    .HasMaxLength(255);
+                
+                entity.Property(e => e.CustomerEmail)
+                    .HasMaxLength(256);
+                
+                entity.Property(e => e.CustomerName)
+                    .HasMaxLength(200);
+
+                entity.HasOne(e => e.Order)
+                    .WithMany(o => o.Payments)
+                    .HasForeignKey(e => e.OrderId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.MasterOrder)
+                    .WithMany(mo => mo.Payments)
+                    .HasForeignKey(e => e.MasterOrderId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(e => e.PaymentIntentId);
+                entity.HasIndex(e => e.TransactionId);
+                entity.HasIndex(e => e.OrderId);
+                entity.HasIndex(e => e.MasterOrderId);
+            });
+
+            // Wishlist Configuration
+            modelBuilder.Entity<Wishlist>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasOne(e => e.User)
+                    .WithMany(u => u.Wishlists)
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.Product)
+                    .WithMany(p => p.Wishlists)
+                    .HasForeignKey(e => e.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // Prevent duplicate products in same user's wishlist
+                entity.HasIndex(e => new { e.UserId, e.ProductId })
+                    .IsUnique();
             });
         }
     }

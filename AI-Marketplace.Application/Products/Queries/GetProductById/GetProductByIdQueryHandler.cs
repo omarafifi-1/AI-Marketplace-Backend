@@ -21,7 +21,7 @@ namespace AI_Marketplace.Application.Products.Queries.GetProductById
         }
         public async Task<GetProductDto?> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
         {
-            var product = await _productRepository.GetByIdAsync(request.Id);
+            var product = await _productRepository.GetByIdAsync(request.Id, cancellationToken);
 
             if (product == null || !product.IsActive)
             {

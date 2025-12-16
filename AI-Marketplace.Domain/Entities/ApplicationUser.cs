@@ -14,9 +14,12 @@ namespace AI_Marketplace.Domain.Entities
 
         // Navigation Properties
         public Store? Store { get; set; }
+        public Cart? Cart { get; set; }
         public ICollection<CustomRequest> CustomRequests { get; set; } = new List<CustomRequest>();
         public ICollection<Order> Orders { get; set; } = new List<Order>();
         public ICollection<ChatSession> ChatSessions { get; set; } = new List<ChatSession>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
+        public ICollection<Address> Addresses { get; set; } = new List<Address>();
+        public ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
     }
 }

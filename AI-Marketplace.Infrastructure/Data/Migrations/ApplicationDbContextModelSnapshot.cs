@@ -22,6 +22,61 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("AI_Marketplace.Domain.Entities.Address", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PostalCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("State")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("StoreId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Street")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StoreId");
+
+                    b.HasIndex("UserId", "IsPrimary");
+
+                    b.ToTable("Addresses");
+                });
+
             modelBuilder.Entity("AI_Marketplace.Domain.Entities.ApplicationUser", b =>
                 {
                     b.Property<int>("Id")
@@ -103,6 +158,68 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("AI_Marketplace.Domain.Entities.Cart", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Carts");
+                });
+
+            modelBuilder.Entity("AI_Marketplace.Domain.Entities.CartItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CartId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("CartId", "ProductId")
+                        .IsUnique();
+
+                    b.ToTable("CartItems");
                 });
 
             modelBuilder.Entity("AI_Marketplace.Domain.Entities.Category", b =>
@@ -258,6 +375,47 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
                     b.ToTable("GeneratedImages");
                 });
 
+            modelBuilder.Entity("AI_Marketplace.Domain.Entities.MasterOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BuyerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ShippingAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ShippingAddressId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BuyerId");
+
+                    b.HasIndex("ShippingAddressId");
+
+                    b.ToTable("MasterOrders");
+                });
+
             modelBuilder.Entity("AI_Marketplace.Domain.Entities.Offer", b =>
                 {
                     b.Property<int>("Id")
@@ -292,9 +450,10 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomRequestId");
-
                     b.HasIndex("StoreId");
+
+                    b.HasIndex("CustomRequestId", "StoreId")
+                        .IsUnique();
 
                     b.ToTable("Offers");
                 });
@@ -313,6 +472,9 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
                     b.Property<DateTime?>("DeliveredAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("MasterOrderId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("OfferId")
                         .HasColumnType("int");
 
@@ -322,10 +484,16 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
                     b.Property<string>("ShippingAddress")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ShippingAddressId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("StoreId")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("TotalAmount")
                         .HasPrecision(18, 2)
@@ -335,9 +503,15 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
 
                     b.HasIndex("BuyerId");
 
+                    b.HasIndex("MasterOrderId");
+
                     b.HasIndex("OfferId")
                         .IsUnique()
                         .HasFilter("[OfferId] IS NOT NULL");
+
+                    b.HasIndex("ShippingAddressId");
+
+                    b.HasIndex("StoreId");
 
                     b.ToTable("Orders");
                 });
@@ -374,6 +548,96 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("OrderItems");
+                });
+
+            modelBuilder.Entity("AI_Marketplace.Domain.Entities.Payment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<long>("Amount")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("BillingAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
+
+                    b.Property<string>("CustomerEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("CustomerName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("FailureReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("MasterOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PaymentGatewayResponse")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentIntentId")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RefundReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RefundTransactionId")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<long?>("RefundedAmount")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("RefundedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TransactionId")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MasterOrderId");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("PaymentIntentId");
+
+                    b.HasIndex("TransactionId");
+
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("AI_Marketplace.Domain.Entities.Product", b =>
@@ -550,12 +814,46 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateOnly>("VerifiedAt")
+                        .HasColumnType("date");
+
+                    b.Property<string>("VerifiedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OwnerId")
                         .IsUnique();
 
                     b.ToTable("Stores");
+                });
+
+            modelBuilder.Entity("AI_Marketplace.Domain.Entities.Wishlist", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AddedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("UserId", "ProductId")
+                        .IsUnique();
+
+                    b.ToTable("Wishlists");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
@@ -691,6 +989,50 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("AI_Marketplace.Domain.Entities.Address", b =>
+                {
+                    b.HasOne("AI_Marketplace.Domain.Entities.Store", null)
+                        .WithMany("Addresses")
+                        .HasForeignKey("StoreId");
+
+                    b.HasOne("AI_Marketplace.Domain.Entities.ApplicationUser", "User")
+                        .WithMany("Addresses")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AI_Marketplace.Domain.Entities.Cart", b =>
+                {
+                    b.HasOne("AI_Marketplace.Domain.Entities.ApplicationUser", "User")
+                        .WithOne("Cart")
+                        .HasForeignKey("AI_Marketplace.Domain.Entities.Cart", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AI_Marketplace.Domain.Entities.CartItem", b =>
+                {
+                    b.HasOne("AI_Marketplace.Domain.Entities.Cart", "Cart")
+                        .WithMany("CartItems")
+                        .HasForeignKey("CartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AI_Marketplace.Domain.Entities.Product", "Product")
+                        .WithMany("CartItems")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Cart");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("AI_Marketplace.Domain.Entities.Category", b =>
                 {
                     b.HasOne("AI_Marketplace.Domain.Entities.Category", "ParentCategory")
@@ -753,6 +1095,24 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
                     b.Navigation("CustomRequest");
                 });
 
+            modelBuilder.Entity("AI_Marketplace.Domain.Entities.MasterOrder", b =>
+                {
+                    b.HasOne("AI_Marketplace.Domain.Entities.ApplicationUser", "Buyer")
+                        .WithMany()
+                        .HasForeignKey("BuyerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AI_Marketplace.Domain.Entities.Address", "ShippingAddressEntity")
+                        .WithMany()
+                        .HasForeignKey("ShippingAddressId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Buyer");
+
+                    b.Navigation("ShippingAddressEntity");
+                });
+
             modelBuilder.Entity("AI_Marketplace.Domain.Entities.Offer", b =>
                 {
                     b.HasOne("AI_Marketplace.Domain.Entities.CustomRequest", "CustomRequest")
@@ -780,14 +1140,36 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("AI_Marketplace.Domain.Entities.MasterOrder", "MasterOrder")
+                        .WithMany("ChildOrders")
+                        .HasForeignKey("MasterOrderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("AI_Marketplace.Domain.Entities.Offer", "Offer")
                         .WithOne("Order")
                         .HasForeignKey("AI_Marketplace.Domain.Entities.Order", "OfferId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("AI_Marketplace.Domain.Entities.Address", "ShippingAddressEntity")
+                        .WithMany("Orders")
+                        .HasForeignKey("ShippingAddressId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("AI_Marketplace.Domain.Entities.Store", "Store")
+                        .WithMany()
+                        .HasForeignKey("StoreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Buyer");
 
+                    b.Navigation("MasterOrder");
+
                     b.Navigation("Offer");
+
+                    b.Navigation("ShippingAddressEntity");
+
+                    b.Navigation("Store");
                 });
 
             modelBuilder.Entity("AI_Marketplace.Domain.Entities.OrderItem", b =>
@@ -807,6 +1189,23 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
                     b.Navigation("Order");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("AI_Marketplace.Domain.Entities.Payment", b =>
+                {
+                    b.HasOne("AI_Marketplace.Domain.Entities.MasterOrder", "MasterOrder")
+                        .WithMany("Payments")
+                        .HasForeignKey("MasterOrderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AI_Marketplace.Domain.Entities.Order", "Order")
+                        .WithMany("Payments")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("MasterOrder");
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("AI_Marketplace.Domain.Entities.Product", b =>
@@ -875,6 +1274,25 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
                     b.Navigation("Owner");
                 });
 
+            modelBuilder.Entity("AI_Marketplace.Domain.Entities.Wishlist", b =>
+                {
+                    b.HasOne("AI_Marketplace.Domain.Entities.Product", "Product")
+                        .WithMany("Wishlists")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AI_Marketplace.Domain.Entities.ApplicationUser", "User")
+                        .WithMany("Wishlists")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
@@ -926,8 +1344,17 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("AI_Marketplace.Domain.Entities.Address", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
             modelBuilder.Entity("AI_Marketplace.Domain.Entities.ApplicationUser", b =>
                 {
+                    b.Navigation("Addresses");
+
+                    b.Navigation("Cart");
+
                     b.Navigation("ChatSessions");
 
                     b.Navigation("CustomRequests");
@@ -937,6 +1364,13 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
                     b.Navigation("Reviews");
 
                     b.Navigation("Store");
+
+                    b.Navigation("Wishlists");
+                });
+
+            modelBuilder.Entity("AI_Marketplace.Domain.Entities.Cart", b =>
+                {
+                    b.Navigation("CartItems");
                 });
 
             modelBuilder.Entity("AI_Marketplace.Domain.Entities.Category", b =>
@@ -960,6 +1394,13 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
                     b.Navigation("Offers");
                 });
 
+            modelBuilder.Entity("AI_Marketplace.Domain.Entities.MasterOrder", b =>
+                {
+                    b.Navigation("ChildOrders");
+
+                    b.Navigation("Payments");
+                });
+
             modelBuilder.Entity("AI_Marketplace.Domain.Entities.Offer", b =>
                 {
                     b.Navigation("Order");
@@ -968,19 +1409,27 @@ namespace AI_Marketplace.Infrastructure.Data.Migrations
             modelBuilder.Entity("AI_Marketplace.Domain.Entities.Order", b =>
                 {
                     b.Navigation("OrderItems");
+
+                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("AI_Marketplace.Domain.Entities.Product", b =>
                 {
+                    b.Navigation("CartItems");
+
                     b.Navigation("OrderItems");
 
                     b.Navigation("ProductImages");
 
                     b.Navigation("Reviews");
+
+                    b.Navigation("Wishlists");
                 });
 
             modelBuilder.Entity("AI_Marketplace.Domain.Entities.Store", b =>
                 {
+                    b.Navigation("Addresses");
+
                     b.Navigation("Offers");
 
                     b.Navigation("Products");

@@ -34,46 +34,57 @@ namespace AI_Marketplace.Application.Products.Queries.GetAllProducts
                 .GetQueryable()
                 .AsNoTracking()
                 .Where(p => p.IsActive);
-              
+
+            // FILTERING
+
+            if (request.CategoryId.HasValue)
+                query = query.Where(p => p.CategoryId == request.CategoryId.Value);
+
+            if (request.MinPrice.HasValue)
+                query = query.Where(p => p.Price >= request.MinPrice.Value);
+
+            if (request.MaxPrice.HasValue)
+                query = query.Where(p => p.Price <= request.MaxPrice.Value);
+
+            if (!string.IsNullOrWhiteSpace(request.Keyword))
+            {
+                var keyword = request.Keyword.ToLower();
+                query = query.Where(p =>
+                    p.Name.ToLower().Contains(keyword) ||
+                    p.Description.ToLower().Contains(keyword));
+            }
+
+            // TOTAL BEFORE PAGINATION
             var totalRecords = await query.CountAsync(cancellationToken);
 
-            if (sortBy == "price")
+            // SORTING
+            query = sortBy switch
             {
-                query = desc ? query.OrderByDescending(p => p.Price)
-                             : query.OrderBy(p => p.Price);
-            }
-            else
-            {
-                query = desc ? query.OrderByDescending(p => p.CreatedAt)
-                             : query.OrderBy(p => p.CreatedAt);
-            }
+                "price" => desc ? query.OrderByDescending(p => p.Price)
+                                : query.OrderBy(p => p.Price),
 
+                "name" => desc ? query.OrderByDescending(p => p.Name)
+                                : query.OrderBy(p => p.Name),
+
+                _ => desc ? query.OrderByDescending(p => p.CreatedAt)
+                          : query.OrderBy(p => p.CreatedAt)
+            };
+
+            // INCLUDE IMAGES & STORE
             query = query
                 .Include(p => p.ProductImages)
                 .Include(p => p.Store);
 
+            // PAGINATION
             var skip = (page - 1) * pageSize;
 
             var items = await query
                 .Skip(skip)
                 .Take(pageSize)
                 .ProjectTo<GetProductDto>(_mapper.ConfigurationProvider)
-                //.Select(p => new GetProductDto
-                //{
-                //    Id = p.Id,
-                //    Name = p.Name,
-                //    Description = p.Description,
-                //    Price = p.Price,
-                //    Stock = p.Stock,
-                //    CreatedAt = p.CreatedAt,
-                //    VendorName = p.Store != null ? p.Store.StoreName : string.Empty,
-                //    ImageUrls = p.ProductImages
-                //        .OrderByDescending(img => img.IsPrimary)
-                //        .Select(img => img.ImageUrl)
-                //        .ToList()
-                //})
                 .ToListAsync(cancellationToken);
 
+            // RETURN PAGED RESULT
             return new PagedProductDto
             {
                 Page = page,
