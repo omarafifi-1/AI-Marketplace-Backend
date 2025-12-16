@@ -11,5 +11,6 @@ namespace AI_Marketplace.Application.Users.DTOs
         public DateTime CreatedAt { get; set; }
         public int? StoreId { get; set; }
         public string? StoreName { get; set; }
+        public bool IsActive { get; set; }
     }
 }

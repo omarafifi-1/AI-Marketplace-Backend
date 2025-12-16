@@ -53,16 +53,6 @@ namespace AI_Marketplace.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpGet]
-        [ProducesResponseType(typeof(List<UserResponseDto>), 200)]
-        public async Task<ActionResult<List<UserResponseDto>>> GetAllUsers()
-        {
-            var query = new GetAllUsersQuery();
-            var users = await _mediator.Send(query);
-            return Ok(users);
-        }
-
         [HttpGet("profile")]
         public async Task<IActionResult> GetProfile()
         {
