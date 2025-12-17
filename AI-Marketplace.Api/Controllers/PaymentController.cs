@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 using System.Security.Claims;
 
 namespace AI_Marketplace.Controllers
@@ -32,12 +33,24 @@ namespace AI_Marketplace.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> CreatePaymentIntentForUser([FromBody] PaymentDto paymentDto)
         {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdString == null)
+            {
+                return Unauthorized();
+            }
+
+            if (!int.TryParse(userIdString, out var userId))
+            {
+                return BadRequest("Invalid User ID");
+            }
+
             try
             {
                 var command = new CreatePaymentIntentCommand
                 {
                     MasterOrderId = paymentDto.MasterOrderId,
-                    Amount = paymentDto.Amount,
+                    UserId = userId,
+                    MehtodOfPayment = paymentDto.ChosenMethodOfPayment,
                     Currency = paymentDto.CurrencyCode
                 };
 

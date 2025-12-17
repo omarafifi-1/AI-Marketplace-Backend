@@ -12,6 +12,6 @@ namespace AI_Marketplace.Domain.enums
         DebitCard,
         BankTransfer,
         Wallet,
-        CashOnDelivery
+        COD
     }
 }

@@ -72,6 +72,15 @@ namespace AI_Marketplace.Infrastructure.Repositories.Payments
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<List<Domain.Entities.Payment>> GetByMasterOrderIdAsync(int masterOrderId, CancellationToken cancellationToken = default)
+        {
+            return await _context.Payments
+                .Include(p => p.MasterOrder)
+                .Where(p => p.MasterOrderId == masterOrderId)
+                .OrderByDescending(p => p.CreatedAt)
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task<List<Domain.Entities.Payment>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             return await _context.Payments
