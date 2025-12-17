@@ -9,7 +9,7 @@ using System.Text;
 
 namespace AI_Marketplace.Application.Addresses.Commands
 {
-    public class CreateAddressCommandHandler : IRequestHandler<CreateAddressCommand, AddressResponseDto>
+    public class CreateAddressCommandHandler : IRequestHandler<CreateAddressCommand, CreateAddressDto>
     {
         private readonly IAddressRepository _repo;
         private readonly IMapper _mapper;
@@ -19,13 +19,13 @@ namespace AI_Marketplace.Application.Addresses.Commands
             _repo = repo;
             _mapper = mapper;
         }
-        public async Task<AddressResponseDto> Handle(CreateAddressCommand request, CancellationToken cancellationToken)
+        public async Task<CreateAddressDto> Handle(CreateAddressCommand request, CancellationToken cancellationToken)
         {
             var address = _mapper.Map<Address>(request.AddressDto);
 
             var result = await _repo.AddAddressAsync(address);
 
-            return _mapper.Map<AddressResponseDto>(result);
+            return _mapper.Map<CreateAddressDto>(result);
         }
     }
 }

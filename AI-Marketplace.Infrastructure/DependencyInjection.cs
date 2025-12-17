@@ -17,8 +17,10 @@ using AI_Marketplace.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Stripe;
 
+using AI_Marketplace.Infrastructure.Repositories.ChatSessions;
+
+using Stripe;
 
 namespace AI_Marketplace.Infrastructure
 {
@@ -29,13 +31,14 @@ namespace AI_Marketplace.Infrastructure
             this IServiceCollection services,
             IConfiguration configuration)
         {
-
+                               
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
            
             // Register Repositories
             services.AddScoped<IStoreRepository, StoreRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IChatSessionRepository, ChatSessionRepository>();
             services.AddScoped<IOfferRepository, OfferRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<ICartRepository, CartRepository>();

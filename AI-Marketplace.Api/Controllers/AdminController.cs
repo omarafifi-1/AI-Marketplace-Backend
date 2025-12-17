@@ -1,5 +1,7 @@
 ﻿using AI_Marketplace.Application.Admin.Commands;
 using AI_Marketplace.Application.Admin.Queries;
+using AI_Marketplace.Application.Users.DTOs;
+using AI_Marketplace.Application.Users.Queries.GetAllUsers;
 using AI_Marketplace.Application.Vendors.Queries;
 using AI_Marketplace.Domain.Entities;
 using MediatR;
@@ -49,7 +51,7 @@ namespace AI_Marketplace.Controllers
             {
                 return BadRequest("Invalid User ID");
             }
-            var result = await _mediator.Send(new ApproveVendorCommand { StoreId = storeId , AdminId = UserIdInt });
+            var result = await _mediator.Send(new ApproveVendorCommand { StoreId = storeId, AdminId = UserIdInt });
             return Ok(result);
         }
 
@@ -74,6 +76,29 @@ namespace AI_Marketplace.Controllers
         {
             var analyticsData = await _mediator.Send(new GetAnalyticsDataQuery());
             return Ok(analyticsData);
+        }
+
+        [HttpPut("users/{userId}/ban")]
+        public async Task<IActionResult> BanUser(int userId)
+        {
+            var result = await _mediator.Send(new BanUserCommand { UserId = userId });
+            return Ok(result);
+        }
+
+        [HttpPut("users/{userId}/unban")]
+        public async Task<IActionResult> UnbanUser(int userId)
+        {
+            var result = await _mediator.Send(new UnbanUserCommand { UserId = userId });
+            return Ok(result);
+        }
+
+        [HttpGet("Users")]
+        [ProducesResponseType(typeof(List<UserResponseDto>), 200)]
+        public async Task<ActionResult<List<UserResponseDto>>> GetAllUsers()
+        {
+            var query = new GetAllUsersQuery();
+            var users = await _mediator.Send(query);
+            return Ok(users);
         }
     }
 }

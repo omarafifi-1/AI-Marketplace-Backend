@@ -2,6 +2,7 @@ using AI_Marketplace.Application.Common.Exceptions;
 using AI_Marketplace.Application.Common.Interfaces;
 using AI_Marketplace.Application.Offers.DTOs;
 using AI_Marketplace.Domain.Entities;
+using AI_Marketplace.Domain.enums;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -187,12 +188,12 @@ namespace AI_Marketplace.Application.Offers.Commands
                 }
 
                 // 7e. Update custom request status to "Closed"
-                customRequest.Status = "Closed";
+                customRequest.Status = CustomRequestStatus.InProgress;
                 customRequest.UpdatedAt = DateTime.UtcNow;
                 await _customRequestRepository.UpdateAsync(customRequest, cancellationToken);
 
                 _logger.LogInformation(
-                    "CustomRequest closed: CustomRequestId={CustomRequestId}",
+                    "CustomRequest status changed to InProgress: CustomRequestId={CustomRequestId}",
                     customRequest.Id);
 
                 _logger.LogInformation(

@@ -18,7 +18,7 @@ namespace AI_Marketplace.Application.Users.DTOs
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
 
-        public List<AddressResponseDto> Addresses { get; set; } = new();
+        public List<CreateAddressDto> Addresses { get; set; } = new();
 
     }
 }

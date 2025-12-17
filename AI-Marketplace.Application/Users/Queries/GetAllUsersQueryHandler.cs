@@ -42,7 +42,8 @@ namespace AI_Marketplace.Application.Features.Users.Queries.GetAllUsers
                     Role = roles.FirstOrDefault() ?? string.Empty,
                     CreatedAt = user.CreatedAt,
                     StoreId = store?.Id,
-                    StoreName = user.Store?.StoreName
+                    StoreName = user.Store?.StoreName,
+                    IsActive = user.IsActive
                 });
             }
 

@@ -12,7 +12,8 @@ namespace AI_Marketplace.Application.Common.Mappings
     {
         public UserMappingProfile()
         {
-            CreateMap<ApplicationUser, GetUserProfileDto>();
+            CreateMap<ApplicationUser, GetUserProfileDto>()
+                .ForMember(dest => dest.Addresses, opt => opt.MapFrom(src => src.Addresses));
 
             CreateMap<UpdateUserProfileDto, ApplicationUser>()
           .ForMember(dest => dest.Id, opt => opt.Ignore())
