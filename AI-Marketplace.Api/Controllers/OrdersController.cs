@@ -22,7 +22,7 @@ namespace AI_Marketplace.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "Buyer,Seller,Admin")]
+        [Authorize(Roles = "Customer,Seller,Admin")]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]

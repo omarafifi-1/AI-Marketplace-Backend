@@ -54,6 +54,7 @@ namespace AI_Marketplace.Infrastructure.ExternalServices
                 Status = paymentIntent.Status,
                 Amount = paymentIntent.Amount,
                 Currency = paymentIntent.Currency,
+                ClientSecret = paymentIntent.ClientSecret,
                 LatestChargeId = paymentIntent.LatestChargeId
             };
         }

@@ -17,6 +17,7 @@ namespace AI_Marketplace.Application.Common.Interfaces
         Task<Domain.Entities.Payment?> GetByPaymentIntentIdAsync(string paymentIntentId, CancellationToken cancellationToken = default);
         Task<Domain.Entities.Payment?> GetByTransactionIdAsync(string transactionId, CancellationToken cancellationToken = default);
         Task<List<Domain.Entities.Payment>> GetByOrderIdAsync(int orderId, CancellationToken cancellationToken = default);
+        Task<List<Domain.Entities.Payment>> GetByMasterOrderIdAsync(int masterOrderId, CancellationToken cancellationToken = default);
         Task<List<Domain.Entities.Payment>> GetAllAsync(CancellationToken cancellationToken = default);
         
         // Queries by Status

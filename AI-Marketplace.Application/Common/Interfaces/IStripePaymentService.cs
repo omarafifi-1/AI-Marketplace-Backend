@@ -22,6 +22,7 @@ namespace AI_Marketplace.Application.Common.Interfaces
         public string Status { get; set; } = string.Empty;
         public long Amount { get; set; }
         public string Currency { get; set; } = string.Empty;
+        public string? ClientSecret { get; set; }
         public string? LatestChargeId { get; set; }
     }
 }

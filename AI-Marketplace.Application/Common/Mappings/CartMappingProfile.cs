@@ -14,10 +14,12 @@ namespace AI_Marketplace.Application.Common.Mappings
             CreateMap<CartItem, CartItemDto>()
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
                 .ForMember(dest => dest.TotalPrice, opt => opt.MapFrom(src => src.UnitPrice * src.Quantity))
-                .ForMember(dest => dest.ProductImageUrl, opt => opt.MapFrom(src => 
-                    src.Product.ProductImages.FirstOrDefault() != null 
-                        ? src.Product.ProductImages.FirstOrDefault()!.ImageUrl 
-                        : null))
+                .ForMember(dest => dest.ProductImageUrl,
+                    opt => opt.MapFrom(src =>
+                    src.Product.ProductImages
+                    .Select(pi => pi.ImageUrl)
+                    .FirstOrDefault()
+                     ))
                 .ForMember(dest => dest.Stock, opt => opt.MapFrom(src => src.Product.Stock));
         }
     }

@@ -66,6 +66,7 @@ namespace AI_Marketplace.Infrastructure.Repositories.Cart
                         .Where(c => c.UserId == userId)
                         .Include(cart => cart.CartItems)
                         .ThenInclude(CartItem => CartItem.Product)
+                        .ThenInclude(p => p.ProductImages)
                         .AsSplitQuery()
                         .SingleOrDefaultAsync(cancellationToken);
         }
