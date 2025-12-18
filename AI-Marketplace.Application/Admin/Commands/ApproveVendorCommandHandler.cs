@@ -13,11 +13,13 @@ namespace AI_Marketplace.Application.Admin.Commands
     {
         private readonly IStoreRepository _storeRepository;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IProductRepository _productRepository;
 
-        public ApproveVendorCommandHandler(IStoreRepository storeRepository, UserManager<ApplicationUser> userManager) 
+        public ApproveVendorCommandHandler(IStoreRepository storeRepository, UserManager<ApplicationUser> userManager, IProductRepository productRepository) 
         {
             _storeRepository = storeRepository;
             _userManager = userManager;
+            _productRepository = productRepository;
         }
         public async Task<string> Handle(ApproveVendorCommand request, CancellationToken cancellationToken)
         {
@@ -42,6 +44,16 @@ namespace AI_Marketplace.Application.Admin.Commands
             }
             store.VerifiedBy = await _userManager.GetUserNameAsync(user);
             await _storeRepository.UpdateAsync(store, cancellationToken);
+            var products = await _productRepository.GetByStoreIdAsync(store.Id, cancellationToken);
+            foreach (var product in products) 
+            {
+                if (product.IsActive) 
+                {
+                    continue;
+                }
+                product.IsActive = true;
+                await _productRepository.UpdateAsync(product, cancellationToken);
+            }
             return "Vendor approved successfully.";
         }
     }
