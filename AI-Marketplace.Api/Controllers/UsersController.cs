@@ -1,4 +1,5 @@
-﻿using AI_Marketplace.Application.Users.Commands;
+﻿using AI_Marketplace.Application.Common.DTOs;
+using AI_Marketplace.Application.Users.Commands;
 using AI_Marketplace.Application.Users.Commands.UpdateUserProfile;
 using AI_Marketplace.Application.Users.DTOs;
 using AI_Marketplace.Application.Users.Queries;
@@ -50,7 +51,47 @@ namespace AI_Marketplace.Controllers
             };
 
             var result = await _mediator.Send(command);
+            SetRefreshTokenCookie(result.RefreshToken!, result.RefreshTokenExpiration);
+            result.RefreshToken = null;
+
             return Ok(result);
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<ActionResult<ApiResponse<LoginResponseDto>>> RefreshToken()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+            
+            if (string.IsNullOrEmpty(refreshToken))
+            {
+                return Unauthorized(ApiResponse<LoginResponseDto>.Fail(
+                    new[] { "Refresh token not found" },
+                    "Unauthorized"
+                ));
+            }
+
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+            var command = new RefreshTokenCommand
+            {
+                RefreshToken = refreshToken,
+                IpAddress = ipAddress
+            };
+            
+            var result = await _mediator.Send(command);
+
+            SetRefreshTokenCookie(result.RefreshToken!, result.RefreshTokenExpiration);
+
+            result.RefreshToken = null;
+
+            return Ok(ApiResponse<LoginResponseDto>.Ok(result, "Token refreshed successfully"));
+        }
+
+        [HttpPost("logout")]
+        [Authorize]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("refreshToken");
+            return Ok(new { message = "Logged Out Successfully" });
         }
 
         [HttpGet("profile")]
@@ -123,5 +164,18 @@ namespace AI_Marketplace.Controllers
             return Ok(result);
         }
 
+        // Helper method to set HttpOnly cookie
+        private void SetRefreshTokenCookie(string refreshToken, DateTime expires)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,   
+                Expires = expires,
+                Path = "/"                    
+            };
+            Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+        }
     }
 }

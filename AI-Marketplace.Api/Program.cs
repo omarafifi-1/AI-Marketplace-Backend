@@ -1,9 +1,11 @@
 using AI_Marketplace.Api.Middleware;
 using AI_Marketplace.Application;
+using AI_Marketplace.Application.Common.Interfaces;
 using AI_Marketplace.Application.Common.Settings;
 using AI_Marketplace.Domain.Entities;
 using AI_Marketplace.Infrastructure;
 using AI_Marketplace.Infrastructure.Data;
+using AI_Marketplace.Infrastructure.Repositories.RefreshTokens;
 using AI_Marketplace.Infrastructure.Seed;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -61,11 +63,15 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins", builder =>
     {
-        builder.AllowAnyOrigin()
+        builder.WithOrigins("http://localhost:4200")
             .AllowAnyMethod()
-            .AllowAnyHeader();
+            .AllowAnyHeader()
+            .AllowCredentials();
     });
 });
+
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 

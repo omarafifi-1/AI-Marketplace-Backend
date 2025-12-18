@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace AI_Marketplace.Infrastructure.ExternalServices
@@ -22,8 +23,13 @@ namespace AI_Marketplace.Infrastructure.ExternalServices
 
         public string GenerateToken(ApplicationUser user, IList<string> roles)
         {
+            return GenerateAccessToken(user, roles);
+        }
+
+        public string GenerateAccessToken(ApplicationUser user, IList<string> roles)
+        {
             var claims = new List<Claim>
-            {
+            { 
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
                 new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
@@ -32,7 +38,6 @@ namespace AI_Marketplace.Infrastructure.ExternalServices
                 new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString())
             };
 
-            // Add roles as claims
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
@@ -45,11 +50,56 @@ namespace AI_Marketplace.Infrastructure.ExternalServices
                 issuer: _jwtSettings.Issuer,
                 audience: _jwtSettings.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddDays(_jwtSettings.ExpirationInDays),
+                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpirationInMinutes),
                 signingCredentials: credentials
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public RefreshToken GenerateRefreshToken(int userId, string ipAddress)
+        {
+            var randomBytes = new byte[64];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomBytes);
+            }
+            return new RefreshToken 
+            { 
+                UserId = userId,
+                Token = Convert.ToBase64String(randomBytes),
+                ExpiresAt = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationInDays),
+                CreatedAt = DateTime.UtcNow,
+                CreatedByIp = ipAddress
+            };
+        }
+
+        public ClaimsPrincipal? ValidatedToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_jwtSettings.SecretKey);
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = true,
+                    ValidIssuer = _jwtSettings.Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = _jwtSettings.Audience,
+                    ValidateLifetime = false,
+                    ClockSkew = TimeSpan.Zero
+                }, out _);
+
+                return principal;
+            }
+
+            catch
+            {
+                return null;
+            }
         }
     }
 }
