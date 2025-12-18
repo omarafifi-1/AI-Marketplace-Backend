@@ -37,6 +37,14 @@ namespace AI_Marketplace.Application.Products.Commands
                 });
             }
 
+            if (!store.IsActive)
+            {
+                throw new ValidationException(new Dictionary<string, string[]>
+                {
+                    { "Store", new[] { "Store is Not Active. Cannot Add Products to an Inactive Store." } }
+                });
+            }
+
             var category = await _categoryRepository.GetByIdAsync(request.CategoryId, cancellationToken);
 
             if (category == null)
