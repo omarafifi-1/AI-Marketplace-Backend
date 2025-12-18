@@ -21,5 +21,6 @@ namespace AI_Marketplace.Domain.Entities
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public ICollection<Address> Addresses { get; set; } = new List<Address>();
         public ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
+        public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     }
 }

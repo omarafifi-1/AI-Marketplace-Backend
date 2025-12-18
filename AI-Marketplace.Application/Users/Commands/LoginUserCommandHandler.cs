@@ -1,9 +1,12 @@
 ﻿using AI_Marketplace.Application.Common.Exceptions;
 using AI_Marketplace.Application.Common.Interfaces;
+using AI_Marketplace.Application.Common.Settings;
 using AI_Marketplace.Application.Users.DTOs;
 using AI_Marketplace.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,17 +21,26 @@ namespace AI_Marketplace.Application.Users.Commands
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IStoreRepository _storeRepository;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly JwtSettings _jwtSettings;
 
         public LoginUserCommandHandler(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IJwtTokenService jwtTokenService,
-            IStoreRepository storeRepository)
+            IStoreRepository storeRepository,
+            IRefreshTokenRepository refreshTokenRepository,
+            IHttpContextAccessor httpContextAccessor,
+            IOptions<JwtSettings> jwtSettings)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtTokenService = jwtTokenService;
             _storeRepository = storeRepository;
+            _refreshTokenRepository = refreshTokenRepository;
+            _httpContextAccessor = httpContextAccessor;
+            _jwtSettings = jwtSettings.Value;
         }
 
         public async Task<LoginResponseDto> Handle(LoginUserCommand request, CancellationToken cancellationToken)
@@ -82,14 +94,26 @@ namespace AI_Marketplace.Application.Users.Commands
                 store = await _storeRepository.GetByOwnerIdAsync(user.Id, cancellationToken);
             }
 
-            // Generate JWT token
-            var token = _jwtTokenService.GenerateToken(user, roles);
+            // Generate access token
+            var accessToken = _jwtTokenService.GenerateAccessToken(user, roles);
+
+            // Generate refresh token
+            var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+            var refreshToken = _jwtTokenService.GenerateRefreshToken(user.Id, ipAddress);
+
+            // Save refresh token to database
+            await _refreshTokenRepository.AddAsync(refreshToken, cancellationToken);
+
+            // Remove old tokens (keep only last 5)
+            await _refreshTokenRepository.RemoveOldTokensAsync(user.Id, cancellationToken);
 
             // Return response
             return new LoginResponseDto
             {
-                Token = token,
-                Expiration = DateTime.UtcNow.AddDays(30),
+                AccessToken = accessToken,
+                RefreshToken = refreshToken.Token,
+                AccessTokenExpiration = DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpirationInMinutes),
+                RefreshTokenExpiration = refreshToken.ExpiresAt,
                 User = new UserResponseDto
                 {
                     Id = user.Id,
