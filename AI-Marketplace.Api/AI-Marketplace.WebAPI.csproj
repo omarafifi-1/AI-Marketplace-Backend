@@ -24,4 +24,8 @@
     <ProjectReference Include="..\AI-Marketplace.Infrastructure\AI-Marketplace.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\products\" />
+  </ItemGroup>
+
 </Project>
