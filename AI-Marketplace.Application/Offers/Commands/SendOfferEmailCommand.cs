@@ -1,9 +1,8 @@
-using AI_Marketplace.Application.Offers.DTOs;
 using MediatR;
 
 namespace AI_Marketplace.Application.Offers.Commands
 {
-    public class AcceptOfferCommand : IRequest<OfferResponseDto>
+    public class SendOfferEmailCommand : IRequest<bool>
     {
         public int OfferId { get; set; }
         
