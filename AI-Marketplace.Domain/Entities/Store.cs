@@ -24,6 +24,7 @@ namespace AI_Marketplace.Domain.Entities
         public DateTime? UpdatedAt { get; set; }
 
         // Navigation Properties
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
         public ApplicationUser Owner { get; set; } = null!;
         public ICollection<Product> Products { get; set; } = new List<Product>();
         public ICollection<Offer> Offers { get; set; } = new List<Offer>();

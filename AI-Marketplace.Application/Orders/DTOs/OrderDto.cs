@@ -15,7 +15,7 @@ namespace AI_Marketplace.Application.Orders.DTOs
         public DateTime? DeliveredAt { get; set; }
         public string BuyerName { get; set; } = string.Empty;
         public int StoreId { get; set; }
-        public string StoreName { get; set; } = string.Empty;
+        public string StoreName { get; set; } 
         public List<OrderItemDto> Items { get; set; } = new();
     }
 }
