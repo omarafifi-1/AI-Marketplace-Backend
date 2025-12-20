@@ -85,6 +85,7 @@ using (var scope = app.Services.CreateScope())
     DbSeeder.Seed(db);
 }
 
+
 // Add the exception handling middleware FIRST
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 

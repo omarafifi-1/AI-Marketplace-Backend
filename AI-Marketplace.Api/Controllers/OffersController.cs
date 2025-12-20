@@ -102,12 +102,12 @@ namespace AI_Marketplace.Controllers
 
         [HttpPut("{id:int}/accept")]
         [Authorize(Roles = "Customer")]
-        [ProducesResponseType(typeof(OrderResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(OfferResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<OrderResponseDto>> AcceptOffer(int id, [FromBody] AcceptOfferDto dto)
+        public async Task<ActionResult<OfferResponseDto>> AcceptOffer(int id)
         {
             // Extract user ID from JWT claims
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -119,13 +119,39 @@ namespace AI_Marketplace.Controllers
             var command = new AcceptOfferCommand
             {
                 OfferId = id,
-                UserId = userId,
-                ShippingAddress = dto.ShippingAddress
+                UserId = userId
             };
 
             var result = await _mediator.Send(command);
 
             return Ok(result);
+        }
+
+        [HttpPost("{id:int}/send-email")]
+        [Authorize(Roles = "Seller")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> SendOfferEmail(int id)
+        {
+            // Extract user ID from JWT claims
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(new { message = "Invalid user authentication." });
+            }
+
+            var command = new SendOfferEmailCommand
+            {
+                OfferId = id,
+                UserId = userId
+            };
+
+            var result = await _mediator.Send(command);
+
+            return Ok(new { message = "Email sent successfully to buyer.", success = result });
         }
 
         [HttpPut("{id:int}")]

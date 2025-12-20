@@ -15,29 +15,26 @@ using System.Threading.Tasks;
 
 namespace AI_Marketplace.Application.Offers.Commands
 {
-    public class AcceptOfferCommandHandler : IRequestHandler<AcceptOfferCommand, OrderResponseDto>
+    public class AcceptOfferCommandHandler : IRequestHandler<AcceptOfferCommand, OfferResponseDto>
     {
         private readonly IOfferRepository _offerRepository;
-        private readonly IOrderRepository _orderRepository;
         private readonly ICustomRequestRepository _customRequestRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<AcceptOfferCommandHandler> _logger;
 
         public AcceptOfferCommandHandler(
             IOfferRepository offerRepository,
-            IOrderRepository orderRepository,
             ICustomRequestRepository customRequestRepository,
             IMapper mapper,
             ILogger<AcceptOfferCommandHandler> logger)
         {
             _offerRepository = offerRepository;
-            _orderRepository = orderRepository;
             _customRequestRepository = customRequestRepository;
             _mapper = mapper;
             _logger = logger;
         }
 
-        public async Task<OrderResponseDto> Handle(AcceptOfferCommand request, CancellationToken cancellationToken)
+        public async Task<OfferResponseDto> Handle(AcceptOfferCommand request, CancellationToken cancellationToken)
         {
             _logger.LogInformation(
                 "Starting offer acceptance: OfferId={OfferId}, UserId={UserId}",
@@ -101,64 +98,14 @@ namespace AI_Marketplace.Application.Offers.Commands
                 });
             }
 
-            // 5. Check idempotency - if order already exists for this offer
-            var existingOrder = await _orderRepository.GetOrderByOfferIdAsync(request.OfferId, cancellationToken);
-            if (existingOrder != null)
-            {
-                _logger.LogInformation(
-                    "Order already exists for offer (idempotency): OrderId={OrderId}, OfferId={OfferId}",
-                    existingOrder.Id,
-                    request.OfferId);
-                
-                return _mapper.Map<OrderResponseDto>(existingOrder);
-            }
-
-            // 6. Validate shipping address
-            if (string.IsNullOrWhiteSpace(request.ShippingAddress))
-            {
-                throw new ValidationException(new Dictionary<string, string[]>
-                {
-                    { "ShippingAddress", new[] { "Shipping address is required." } }
-                });
-            }
-
-            if (request.ShippingAddress.Length > 500)
-            {
-                throw new ValidationException(new Dictionary<string, string[]>
-                {
-                    { "ShippingAddress", new[] { "Shipping address cannot exceed 500 characters." } }
-                });
-            }
-
-            // 7. Begin database transaction
-            Order createdOrder;
+            // 5. Begin database transaction
             try
             {
                 _logger.LogInformation(
                     "Starting transaction for offer acceptance: OfferId={OfferId}",
                     request.OfferId);
 
-                // 7a. Create Order with StoreId from offer
-                var order = new Order
-                {
-                    BuyerId = request.UserId,
-                    StoreId = offer.StoreId,
-                    OfferId = offer.Id,
-                    TotalAmount = offer.ProposedPrice,
-                    Status = "Pending",
-                    ShippingAddress = request.ShippingAddress.Trim(),
-                    OrderDate = DateTime.UtcNow
-                };
-
-                createdOrder = await _orderRepository.CreateAsync(order, cancellationToken);
-
-                _logger.LogInformation(
-                    "Order created: OrderId={OrderId}, StoreId={StoreId}, TotalAmount={TotalAmount}",
-                    createdOrder.Id,
-                    createdOrder.StoreId,
-                    createdOrder.TotalAmount);
-
-                // 7b. Update accepted offer status
+                // 5a. Update accepted offer status
                 offer.Status = "Accepted";
                 await _offerRepository.UpdateAsync(offer, cancellationToken);
 
@@ -166,7 +113,7 @@ namespace AI_Marketplace.Application.Offers.Commands
                     "Offer status updated to Accepted: OfferId={OfferId}",
                     offer.Id);
 
-                // 7c. Get all pending offers for the custom request
+                // 5b. Get all pending offers for the custom request
                 var pendingOffers = await _offerRepository.GetPendingByCustomRequestIdAsync(
                     offer.CustomRequestId,
                     cancellationToken);
@@ -176,7 +123,7 @@ namespace AI_Marketplace.Application.Offers.Commands
                     pendingOffers.Count,
                     offer.CustomRequestId);
 
-                // 7d. Update all other pending offers to "Rejected"
+                // 5c. Update all other pending offers to "Rejected"
                 foreach (var pendingOffer in pendingOffers.Where(o => o.Id != offer.Id))
                 {
                     pendingOffer.Status = "Rejected";
@@ -187,7 +134,7 @@ namespace AI_Marketplace.Application.Offers.Commands
                         pendingOffer.Id);
                 }
 
-                // 7e. Update custom request status to "Closed"
+                // 5d. Update custom request status to "InProgress"
                 customRequest.Status = CustomRequestStatus.InProgress;
                 customRequest.UpdatedAt = DateTime.UtcNow;
                 await _customRequestRepository.UpdateAsync(customRequest, cancellationToken);
@@ -197,8 +144,8 @@ namespace AI_Marketplace.Application.Offers.Commands
                     customRequest.Id);
 
                 _logger.LogInformation(
-                    "Transaction completed successfully for offer acceptance: OrderId={OrderId}",
-                    createdOrder.Id);
+                    "Transaction completed successfully for offer acceptance: OfferId={OfferId}",
+                    offer.Id);
             }
             catch (Exception ex)
             {
@@ -209,25 +156,24 @@ namespace AI_Marketplace.Application.Offers.Commands
                 throw;
             }
 
-            // 8. Retrieve the complete order with all navigation properties for mapping
-            var orderWithDetails = await _orderRepository.GetOrderByIdAsync(createdOrder.Id, cancellationToken);
-            if (orderWithDetails == null)
+            // 6. Retrieve the complete offer with all navigation properties for mapping
+            var offerWithDetails = await _offerRepository.GetByIdAsync(offer.Id, cancellationToken);
+            if (offerWithDetails == null)
             {
                 _logger.LogError(
-                    "Failed to retrieve created order: OrderId={OrderId}",
-                    createdOrder.Id);
+                    "Failed to retrieve accepted offer: OfferId={OfferId}",
+                    offer.Id);
                 throw new NotFoundException(new Dictionary<string, string[]>
                 {
-                    { "Order", new[] { "Failed to retrieve created order." } }
+                    { "Offer", new[] { "Failed to retrieve accepted offer." } }
                 });
             }
 
             _logger.LogInformation(
-                "Offer acceptance completed successfully: OrderId={OrderId}, OfferId={OfferId}",
-                orderWithDetails.Id,
-                request.OfferId);
+                "Offer acceptance completed successfully: OfferId={OfferId}",
+                offerWithDetails.Id);
 
-            return _mapper.Map<OrderResponseDto>(orderWithDetails);
+            return _mapper.Map<OfferResponseDto>(offerWithDetails);
         }
     }
 }
