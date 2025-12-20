@@ -39,6 +39,7 @@ namespace AI_Marketplace.Infrastructure.Repositories.Orders
                     .ThenInclude(of => of.CustomRequest)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.Product)
+                    .ThenInclude(p => p.ProductImages)
                 .FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
         }
 
@@ -72,6 +73,7 @@ namespace AI_Marketplace.Infrastructure.Repositories.Orders
         {
             return await _context.Orders
                     .Where(o => o.BuyerId == buyerId)
+                    .Include(o => o.Store)
                     .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.Product)
                     .ToListAsync(cancellationToken);

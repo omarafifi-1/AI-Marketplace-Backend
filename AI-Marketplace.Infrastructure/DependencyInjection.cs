@@ -13,14 +13,14 @@ using AI_Marketplace.Infrastructure.Repositories.Payments;
 using AI_Marketplace.Infrastructure.Repositories.Products;
 using AI_Marketplace.Infrastructure.Repositories.Stores;
 using AI_Marketplace.Infrastructure.Repositories.Wishlist;
+using AI_Marketplace.Infrastructure.Repositories.Reviews;
 using AI_Marketplace.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
 using AI_Marketplace.Infrastructure.Repositories.ChatSessions;
-
 using Stripe;
+
 
 namespace AI_Marketplace.Infrastructure
 {
@@ -48,6 +48,7 @@ namespace AI_Marketplace.Infrastructure
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<IWishlistRepository, WishlistRepository>();
+            services.AddScoped<IReviewsRepository, ReviewsRepository>(); 
 
             // Register JWT Token Service
             services.AddScoped<IJwtTokenService, JwtTokenService>();
